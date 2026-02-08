@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Writer — FUTARIGURASHI</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    .writer-wrap { max-width: 42rem; margin: 0 auto; padding: var(--space-m); }
+    .writer-wrap h1 { font-size: 1.25rem; margin-bottom: var(--space-m); }
+    .writer-form label { display: block; font-weight: 500; margin-bottom: 0.25rem; font-size: 0.9rem; }
+    .writer-form input[type="text"],
+    .writer-form input[type="date"],
+    .writer-form textarea { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius); font-family: inherit; font-size: 1rem; margin-bottom: var(--space-s); }
+    .writer-form textarea { min-height: 120px; resize: vertical; }
+    .writer-form .body-field { min-height: 280px; }
+    .writer-form .hint { font-size: 0.8rem; color: var(--color-text-muted); margin-top: -0.5rem; margin-bottom: var(--space-s); }
+    .writer-actions { display: flex; gap: var(--space-s); margin-top: var(--space-m); flex-wrap: wrap; }
+    .writer-actions button { padding: 0.5rem 1rem; border-radius: var(--radius); font-family: inherit; font-size: 0.95rem; cursor: pointer; border: none; }
+    .btn-primary { background: var(--color-accent); color: #fff; }
+    .btn-primary:hover { background: var(--color-accent-hover); }
+    .btn-secondary { background: var(--color-border); color: var(--color-text); }
+    .btn-secondary:hover { background: #ddd; }
+    .btn-danger { background: #b00; color: #fff; }
+    .btn-danger:hover { background: #900; }
+    .writer-back { margin-bottom: var(--space-m); font-size: 0.9rem; }
+    .save-status { margin-top: var(--space-s); font-size: 0.9rem; }
+    .save-status.ok { color: #0a6b0a; }
+    .save-status.err { color: #b00; }
+    .post-list { width: 100%; border-collapse: collapse; }
+    .post-list th, .post-list td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--color-border); }
+    .post-list th { font-weight: 600; }
+    .post-list .status-draft { color: var(--color-text-muted); font-size: 0.85rem; }
+    .post-list .status-published { color: #0a6b0a; font-size: 0.85rem; }
+    .post-list .actions { white-space: nowrap; }
+    .post-list .actions a, .post-list .actions button { margin-right: 0.5rem; font-size: 0.9rem; }
+    .writer-nav { display: flex; gap: var(--space-m); margin-bottom: var(--space-m); flex-wrap: wrap; }
+    .writer-nav a { font-size: 0.9rem; }
+    #listView.hidden, #editView.hidden { display: none !important; }
+    .list-loading { padding: var(--space-m); color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <div class="site-wrap">
+    <div class="writer-nav">
+      <a href="#" id="backToList" class="writer-back">← 記事一覧</a>
+      <a href="#" id="backToBlog" class="writer-back">ブログを見る</a>
+    </div>
+
+    <div id="listView" class="writer-wrap">
+      <h1>記事一覧</h1>
+      <p><button type="button" class="btn-primary" id="btnNewPost">新規記事</button></p>
+      <div id="listContent" class="list-loading">読み込み中…</div>
+    </div>
+
+    <div id="editView" class="writer-wrap hidden">
+      <h1 id="editTitle">New post</h1>
+      <form class="writer-form" id="postForm">
+        <input type="hidden" id="slug" name="slug">
+        <label for="title">タイトル</label>
+        <input type="text" id="title" name="title" required placeholder="記事のタイトル">
+
+        <label for="date">日付</label>
+        <input type="date" id="date" name="date" required>
+        <p class="hint">公開日（YYYY-MM-DD）</p>
+
+        <label for="categories">カテゴリー（カンマ区切り）</label>
+        <input type="text" id="categories" name="categories" placeholder="旅行, ブラジル">
+        <p class="hint">例: 旅行, ブラジル</p>
+
+        <label for="excerpt">抜粋（一覧用・任意）</label>
+        <textarea id="excerpt" name="excerpt" rows="2" placeholder="最初の1〜2文を書くと一覧で表示されます"></textarea>
+
+        <label for="body">本文（Markdown可）</label>
+        <textarea id="body" name="body" class="body-field" required placeholder="本文をここに。&#10;&#10;画像: ![説明](images/photo.jpg)&#10;見出し: ## 見出し"></textarea>
+        <p class="hint">Markdown: **太字** / ## 見出し / ![alt](images/ファイル.jpg)</p>
+
+        <div class="writer-actions">
+          <button type="button" class="btn-secondary" id="btnSaveDraft">下書き保存</button>
+          <button type="button" class="btn-primary" id="btnPublish">公開する</button>
+        </div>
+      </form>
+      <div class="save-status" id="saveStatus"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var listView = document.getElementById('listView');
+      var editView = document.getElementById('editView');
+      var listContent = document.getElementById('listContent');
+      var backToList = document.getElementById('backToList');
+      var backToBlog = document.getElementById('backToBlog');
+      var btnNewPost = document.getElementById('btnNewPost');
+      var form = document.getElementById('postForm');
+      var slugInput = document.getElementById('slug');
+      var titleInput = document.getElementById('title');
+      var dateInput = document.getElementById('date');
+      var categoriesInput = document.getElementById('categories');
+      var excerptInput = document.getElementById('excerpt');
+      var bodyInput = document.getElementById('body');
+      var saveStatus = document.getElementById('saveStatus');
+      var editTitleEl = document.getElementById('editTitle');
+
+      function slugFromTitle(s) {
+        return String(s || '')
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf-]/g, '')
+          .replace(/-+/g, '-')
+          .slice(0, 80) || 'post';
+      }
+
+      function showList() {
+        location.hash = '';
+        listView.classList.remove('hidden');
+        editView.classList.add('hidden');
+        loadList();
+      }
+
+      function showEdit(slug) {
+        location.hash = slug ? 'edit/' + slug : 'new';
+        listView.classList.add('hidden');
+        editView.classList.remove('hidden');
+        if (slug) {
+          editTitleEl.textContent = '記事を編集';
+          loadPost(slug);
+        } else {
+          editTitleEl.textContent = '新規記事';
+          slugInput.value = '';
+          titleInput.value = '';
+          dateInput.value = new Date().toISOString().slice(0, 10);
+          categoriesInput.value = '';
+          excerptInput.value = '';
+          bodyInput.value = '';
+          saveStatus.textContent = '';
+          saveStatus.className = 'save-status';
+        }
+      }
+
+      function loadList() {
+        listContent.innerHTML = '読み込み中…';
+        fetch('/api/posts')
+          .then(function (r) { return r.json(); })
+          .then(function (posts) {
+            if (!posts.length) {
+              listContent.innerHTML = '<p>記事がありません。「新規記事」から追加してください。</p>';
+              return;
+            }
+            var html = '<table class="post-list"><thead><tr><th>タイトル</th><th>日付</th><th>状態</th><th></th></tr></thead><tbody>';
+            posts.forEach(function (p) {
+              var statusClass = p.status === 'draft' ? 'status-draft' : 'status-published';
+              var statusText = p.status === 'draft' ? '下書き' : '公開';
+              html += '<tr><td>' + escapeHtml(p.title) + '</td><td>' + escapeHtml(p.date) + '</td><td class="' + statusClass + '">' + statusText + '</td><td class="actions">';
+              html += '<a href="#edit/' + escapeHtml(p.slug) + '">編集</a>';
+              html += '<button type="button" class="btn-danger" data-slug="' + escapeHtml(p.slug) + '" data-title="' + escapeHtml(p.title) + '">削除</button>';
+              html += '</td></tr>';
+            });
+            html += '</tbody></table>';
+            listContent.innerHTML = html;
+            listContent.querySelectorAll('button[data-slug]').forEach(function (btn) {
+              btn.addEventListener('click', function () {
+                if (!confirm('「' + btn.getAttribute('data-title') + '」を削除しますか？')) return;
+                fetch('/api/posts/' + encodeURIComponent(btn.getAttribute('data-slug')), { method: 'DELETE' })
+                  .then(function (r) { return r.json(); })
+                  .then(function () { loadList(); })
+                  .catch(function () { alert('削除に失敗しました'); });
+              });
+            });
+            listContent.querySelectorAll('a[href^="#edit/"]').forEach(function (a) {
+              a.addEventListener('click', function (e) {
+                e.preventDefault();
+                var slug = (a.getAttribute('href') || '').replace(/^#edit\//, '');
+                try { slug = decodeURIComponent(slug); } catch (x) {}
+                showEdit(slug);
+              });
+            });
+          })
+          .catch(function () {
+            listContent.innerHTML = '<p class="save-status err">一覧の取得に失敗しました。writer-server が起動しているか確認してください。</p>';
+          });
+      }
+
+      function loadPost(slug) {
+        saveStatus.textContent = '読み込み中…';
+        saveStatus.className = 'save-status';
+        fetch('/api/posts/' + encodeURIComponent(slug))
+          .then(function (r) {
+            if (!r.ok) throw new Error('Not found');
+            return r.json();
+          })
+          .then(function (p) {
+            slugInput.value = p.slug || '';
+            titleInput.value = p.title || '';
+            dateInput.value = (p.date || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
+            categoriesInput.value = Array.isArray(p.categories) ? p.categories.join(', ') : (p.categories || '');
+            excerptInput.value = p.excerpt || '';
+            bodyInput.value = p.body || '';
+            saveStatus.textContent = '';
+          })
+          .catch(function () {
+            saveStatus.textContent = '記事の読み込みに失敗しました';
+            saveStatus.className = 'save-status err';
+          });
+      }
+
+      function getFormData() {
+        var catStr = categoriesInput.value.trim();
+        return {
+          slug: slugInput.value.trim() || slugFromTitle(titleInput.value),
+          title: titleInput.value.trim(),
+          date: dateInput.value.trim(),
+          categories: catStr ? catStr.split(',').map(function (c) { return c.trim(); }).filter(Boolean) : [],
+          excerpt: excerptInput.value.trim(),
+          body: bodyInput.value.trim()
+        };
+      }
+
+      function setStatus(msg, isErr) {
+        saveStatus.textContent = msg;
+        saveStatus.className = 'save-status' + (isErr ? ' err' : ' ok');
+      }
+
+      document.getElementById('btnSaveDraft').addEventListener('click', function () {
+        var data = getFormData();
+        saveStatus.textContent = '保存中…';
+        saveStatus.className = 'save-status';
+        fetch('/api/posts/draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (res) {
+            if (res.error) {
+              setStatus(res.error, true);
+              return;
+            }
+            slugInput.value = res.slug || data.slug;
+            setStatus('下書きを保存しました');
+          })
+          .catch(function () {
+            setStatus('保存に失敗しました', true);
+          });
+      });
+
+      document.getElementById('btnPublish').addEventListener('click', function () {
+        var data = getFormData();
+        saveStatus.textContent = '公開中…（ビルドと push に少し時間がかかります）';
+        saveStatus.className = 'save-status';
+        fetch('/api/posts/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (res) {
+            if (res.error) {
+              setStatus(res.error + (res.detail ? ': ' + res.detail : ''), true);
+              return;
+            }
+            slugInput.value = res.slug || data.slug;
+            setStatus('公開しました。ブログで確認できます。');
+          })
+          .catch(function () {
+            setStatus('公開に失敗しました', true);
+          });
+      });
+
+      backToList.addEventListener('click', function (e) {
+        e.preventDefault();
+        showList();
+      });
+      backToBlog.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.open(backToBlog.href, '_blank');
+      });
+      fetch('/api/config').then(function (r) { return r.json(); }).then(function (c) {
+        if (c.siteUrl) backToBlog.href = c.siteUrl;
+      }).catch(function () {});
+
+      btnNewPost.addEventListener('click', function () {
+        showEdit(null);
+      });
+
+      function escapeHtml(s) {
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function onHashChange() {
+        var hash = (location.hash || '').replace(/^#/, '');
+        if (hash === 'new') {
+          showEdit(null);
+          return;
+        }
+        if (hash.indexOf('edit/') === 0) {
+          var slug = hash.slice(5);
+          try { slug = decodeURIComponent(slug); } catch (x) {}
+          showEdit(slug);
+          return;
+        }
+        listView.classList.remove('hidden');
+        editView.classList.add('hidden');
+        loadList();
+      }
+      window.addEventListener('hashchange', onHashChange);
+      if (location.hash) onHashChange(); else loadList();
+    })();
+  </script>
+</body>
+</html>

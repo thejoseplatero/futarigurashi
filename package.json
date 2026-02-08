@@ -1,0 +1,14 @@
+{
+  "name": "futarigurashi",
+  "private": true,
+  "scripts": {
+    "import-wp": "node scripts/import-wp.js",
+    "build": "node scripts/build-from-markdown.js",
+    "migrate-media": "node scripts/migrate-media.js",
+    "migrate-media:dry": "node scripts/migrate-media.js --dry-run"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.3.2",
+    "marked": "^17.0.1"
+  }
+}
