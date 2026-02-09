@@ -158,6 +158,59 @@ function listPosts() {
   return list;
 }
 
+/** Extract inner HTML of first <div class="entry-content"> (match closing div by depth). */
+function extractEntryContent(html) {
+  const startTag = '<div class="entry-content">';
+  const idx = html.indexOf(startTag);
+  if (idx === -1) return '';
+  let start = html.indexOf('>', idx) + 1;
+  let depth = 1;
+  let pos = start;
+  const len = html.length;
+  while (depth > 0 && pos < len) {
+    const nextOpen = html.indexOf('<div', pos);
+    const nextClose = html.indexOf('</div>', pos);
+    if (nextClose === -1) break;
+    if (nextOpen !== -1 && nextOpen < nextClose) {
+      depth++;
+      pos = nextOpen + 4;
+    } else {
+      depth--;
+      if (depth === 0) {
+        return html.slice(start, nextClose).trim();
+      }
+      pos = nextClose + 6;
+    }
+  }
+  return '';
+}
+
+/** Load published post from posts.json + posts/slug.html when no .md in drafts/content. */
+function getPostFromPublished(safeSlug) {
+  if (!fs.existsSync(POSTS_JSON)) return null;
+  let list;
+  try {
+    list = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8'));
+  } catch (e) {
+    return null;
+  }
+  const found = list.find((p) => p.slug === safeSlug);
+  if (!found) return null;
+  const htmlPath = path.join(POSTS_DIR, safeSlug + '.html');
+  if (!fs.existsSync(htmlPath)) return null;
+  const html = fs.readFileSync(htmlPath, 'utf8');
+  const body = extractEntryContent(html);
+  return {
+    slug: found.slug,
+    title: found.title || found.slug,
+    date: found.date || '',
+    categories: found.categories || [],
+    excerpt: found.excerpt || '',
+    body,
+    status: 'published'
+  };
+}
+
 function getPost(slug) {
   const safeSlug = slugify(slug) || 'post';
   for (const dir of [DRAFTS_DIR, CONTENT_DIR]) {
@@ -176,7 +229,7 @@ function getPost(slug) {
       };
     }
   }
-  return null;
+  return getPostFromPublished(safeSlug);
 }
 
 function runBuild() {
@@ -246,7 +299,12 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname.startsWith('/api/posts/')) {
-    const suffix = pathname.slice('/api/posts/'.length);
+    let suffix = pathname.slice('/api/posts/'.length);
+    try {
+      suffix = decodeURIComponent(suffix);
+    } catch (e) {
+      // leave suffix as-is if decoding fails
+    }
     if (suffix === 'draft' && req.method === 'POST') {
       let body = '';
       req.on('data', (chunk) => { body += chunk; });

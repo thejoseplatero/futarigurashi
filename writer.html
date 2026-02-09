@@ -37,50 +37,105 @@
     .post-list .status-published { color: #0a6b0a; font-size: 0.85rem; }
     .post-list .actions { white-space: nowrap; }
     .post-list .actions a, .post-list .actions button { margin-right: 0.5rem; font-size: 0.9rem; }
-    .writer-nav { display: flex; gap: var(--space-m); margin-bottom: var(--space-m); flex-wrap: wrap; }
+    .writer-nav { display: flex; gap: var(--space-m); margin-bottom: var(--space-m); flex-wrap: wrap; align-items: center; }
     .writer-nav a { font-size: 0.9rem; }
+    .writer-lang { margin-left: auto; font-size: 0.85rem; }
+    .writer-lang button { background: none; border: none; cursor: pointer; padding: 0.25rem 0.5rem; color: var(--color-text-muted); font-family: inherit; }
+    .writer-lang button:hover { color: var(--color-text); }
+    .writer-lang button.active { font-weight: 600; color: var(--color-text); }
     #listView.hidden, #editView.hidden { display: none !important; }
     .list-loading { padding: var(--space-m); color: var(--color-text-muted); }
+    .delete-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .delete-overlay.hidden { display: none !important; }
+    .delete-modal { background: var(--color-bg, #fff); padding: var(--space-m); border-radius: var(--radius); max-width: 24rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .delete-modal h3 { margin: 0 0 var(--space-s); font-size: 1.1rem; }
+    .delete-modal p { margin: 0 0 var(--space-m); font-size: 0.95rem; color: var(--color-text-muted, #555); }
+    .delete-modal label { display: block; font-size: 0.9rem; margin-bottom: 0.25rem; }
+    .delete-modal input { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius); margin-bottom: var(--space-m); }
+    .delete-modal .modal-actions { display: flex; gap: var(--space-s); justify-content: flex-end; }
+    .delete-modal .modal-actions button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .body-toolbar { display: flex; flex-wrap: wrap; gap: var(--space-s); align-items: center; margin-bottom: var(--space-s); }
+    .body-toolbar button { padding: 0.35rem 0.75rem; font-size: 0.9rem; border-radius: var(--radius); border: 1px solid var(--color-border); background: var(--color-bg); cursor: pointer; font-family: inherit; }
+    .body-toolbar button:hover { background: #f0f0f0; }
+    .body-images { margin-top: var(--space-s); }
+    .body-images h4 { font-size: 0.9rem; margin: 0 0 0.5rem; font-weight: 600; }
+    .body-images-list { display: flex; flex-wrap: wrap; gap: var(--space-s); align-items: flex-start; }
+    .body-images-item { position: relative; border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; max-width: 160px; }
+    .body-images-item img { display: block; max-width: 100%; height: auto; max-height: 120px; object-fit: cover; }
+    .body-images-item .img-remove { position: absolute; top: 2px; right: 2px; padding: 0.2rem 0.4rem; font-size: 0.75rem; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 3px; cursor: pointer; }
+    .body-images-item .img-remove:hover { background: #b00; }
+    .body-preview { margin-top: var(--space-m); padding: var(--space-s); border: 1px solid var(--color-border); border-radius: var(--radius); background: #fafafa; max-height: 320px; overflow: auto; }
+    .body-preview h4 { font-size: 0.9rem; margin: 0 0 0.5rem; font-weight: 600; }
+    .body-preview .preview-content { font-size: 0.9rem; line-height: 1.5; }
+    .body-preview .preview-content img { max-width: 100%; height: auto; vertical-align: middle; margin: 0.25rem 0; }
   </style>
 </head>
 <body>
+  <div id="deleteOverlay" class="delete-overlay hidden">
+    <div class="delete-modal">
+      <h3 id="deleteModalTitle" data-i18n="deleteModalTitle">記事を削除</h3>
+      <p id="deleteConfirmMessage"><span id="deleteConfirmPrefix"></span><span id="deleteConfirmTitle"></span><span id="deleteConfirmSuffix"></span></p>
+      <label for="deleteConfirmInput" id="deleteConfirmLabel" data-i18n="deleteConfirmLabel">削除するには「削除」と入力してください</label>
+      <input type="text" id="deleteConfirmInput" data-i18n-ph="deletePlaceholder" autocomplete="off">
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="deleteCancelBtn" data-i18n="deleteCancel">キャンセル</button>
+        <button type="button" class="btn-danger" id="deleteConfirmBtn" data-i18n="deleteConfirm" disabled>削除する</button>
+      </div>
+    </div>
+  </div>
   <div class="site-wrap">
     <div class="writer-nav">
-      <a href="#" id="backToList" class="writer-back">← 記事一覧</a>
-      <a href="#" id="backToBlog" class="writer-back">ブログを見る</a>
+      <a href="#" id="backToList" class="writer-back" data-i18n="navBackToList">← 記事一覧</a>
+      <a href="#" id="backToBlog" class="writer-back" data-i18n="navViewBlog">ブログを見る</a>
+      <span class="writer-lang">
+        <button type="button" id="langJa" aria-pressed="true">日本語</button>
+        <span aria-hidden="true"> / </span>
+        <button type="button" id="langEn" aria-pressed="false">English</button>
+      </span>
     </div>
 
     <div id="listView" class="writer-wrap">
-      <h1>記事一覧</h1>
-      <p><button type="button" class="btn-primary" id="btnNewPost">新規記事</button></p>
-      <div id="listContent" class="list-loading">読み込み中…</div>
+      <h1 id="listTitle" data-i18n="listTitle">記事一覧</h1>
+      <p><button type="button" class="btn-primary" id="btnNewPost" data-i18n="btnNewPost">新規記事</button></p>
+      <div id="listContent" class="list-loading" data-i18n="loading">読み込み中…</div>
     </div>
 
     <div id="editView" class="writer-wrap hidden">
       <h1 id="editTitle">New post</h1>
       <form class="writer-form" id="postForm">
         <input type="hidden" id="slug" name="slug">
-        <label for="title">タイトル</label>
-        <input type="text" id="title" name="title" required placeholder="記事のタイトル">
+        <label for="title" data-i18n="labelTitle">タイトル</label>
+        <input type="text" id="title" name="title" required data-i18n-ph="placeholderTitle">
 
-        <label for="date">日付</label>
+        <label for="date" data-i18n="labelDate">日付</label>
         <input type="date" id="date" name="date" required>
-        <p class="hint">公開日（YYYY-MM-DD）</p>
+        <p class="hint" data-i18n="hintDate">公開日（YYYY-MM-DD）</p>
 
-        <label for="categories">カテゴリー（カンマ区切り）</label>
-        <input type="text" id="categories" name="categories" placeholder="旅行, ブラジル">
-        <p class="hint">例: 旅行, ブラジル</p>
+        <label for="categories" data-i18n="labelCategories">カテゴリー（カンマ区切り）</label>
+        <input type="text" id="categories" name="categories" data-i18n-ph="placeholderCategories">
+        <p class="hint" data-i18n="hintCategories">例: 旅行, ブラジル</p>
 
-        <label for="excerpt">抜粋（一覧用・任意）</label>
-        <textarea id="excerpt" name="excerpt" rows="2" placeholder="最初の1〜2文を書くと一覧で表示されます"></textarea>
+        <label for="excerpt" data-i18n="labelExcerpt">抜粋（一覧用・任意）</label>
+        <textarea id="excerpt" name="excerpt" rows="2" data-i18n-ph="placeholderExcerpt"></textarea>
 
-        <label for="body">本文（Markdown可）</label>
-        <textarea id="body" name="body" class="body-field" required placeholder="本文をここに。&#10;&#10;画像: ![説明](images/photo.jpg)&#10;見出し: ## 見出し"></textarea>
-        <p class="hint">Markdown: **太字** / ## 見出し / ![alt](images/ファイル.jpg)</p>
+        <label for="body" data-i18n="labelBody">本文（Markdown可）</label>
+        <div class="body-toolbar">
+          <button type="button" id="btnInsertImage" data-i18n="btnInsertImage">画像を挿入</button>
+        </div>
+        <textarea id="body" name="body" class="body-field" required data-i18n-ph="placeholderBody"></textarea>
+        <div class="body-images" id="bodyImagesSection" style="display: none;">
+          <h4 id="bodyImagesTitle" data-i18n="bodyImagesTitle">本文の画像</h4>
+          <div class="body-images-list" id="bodyImagesList"></div>
+        </div>
+        <div class="body-preview" id="bodyPreviewSection">
+          <h4 id="bodyPreviewTitle" data-i18n="bodyPreviewTitle">プレビュー</h4>
+          <div class="body-preview-content preview-content" id="bodyPreviewContent"></div>
+        </div>
+        <p class="hint" data-i18n="hintMarkdown">Markdown: **太字** / ## 見出し / ![alt](images/ファイル.jpg)</p>
 
         <div class="writer-actions">
-          <button type="button" class="btn-secondary" id="btnSaveDraft">下書き保存</button>
-          <button type="button" class="btn-primary" id="btnPublish">公開する</button>
+          <button type="button" class="btn-secondary" id="btnSaveDraft" data-i18n="btnSaveDraft">下書き保存</button>
+          <button type="button" class="btn-primary" id="btnPublish" data-i18n="btnPublish">公開する</button>
         </div>
       </form>
       <div class="save-status" id="saveStatus"></div>
@@ -89,6 +144,147 @@
 
   <script>
     (function () {
+      // When not served by writer-server (port 3765), call API at localhost:3765 (CORS allowed)
+      var API_BASE = (location.hostname === 'localhost' && location.port === '3765') ? '' : 'http://localhost:3765';
+
+      var STRINGS = {
+        ja: {
+          navBackToList: '← 記事一覧',
+          navViewBlog: 'ブログを見る',
+          listTitle: '記事一覧',
+          btnNewPost: '新規記事',
+          loading: '読み込み中…',
+          editTitleNew: '新規記事',
+          editTitleEdit: '記事を編集',
+          labelTitle: 'タイトル',
+          placeholderTitle: '記事のタイトル',
+          labelDate: '日付',
+          hintDate: '公開日（YYYY-MM-DD）',
+          labelCategories: 'カテゴリー（カンマ区切り）',
+          placeholderCategories: '旅行, ブラジル',
+          hintCategories: '例: 旅行, ブラジル',
+          labelExcerpt: '抜粋（一覧用・任意）',
+          placeholderExcerpt: '最初の1〜2文を書くと一覧で表示されます',
+          labelBody: '本文（Markdown可）',
+          placeholderBody: '本文をここに。\n\n画像: ![説明](images/photo.jpg)\n見出し: ## 見出し',
+          hintMarkdown: 'Markdown: **太字** / ## 見出し / ![alt](images/ファイル.jpg)',
+          btnSaveDraft: '下書き保存',
+          btnPublish: '公開する',
+          btnInsertImage: '画像を挿入',
+          bodyImagesTitle: '本文の画像',
+          bodyPreviewTitle: 'プレビュー',
+          imgRemove: '削除',
+          deleteModalTitle: '記事を削除',
+          deleteConfirmPrefix: '「',
+          deleteConfirmSuffix: '」を削除しますか？',
+          deleteConfirmLabel: '削除するには「削除」と入力してください',
+          deletePlaceholder: '削除',
+          deleteCancel: 'キャンセル',
+          deleteConfirm: '削除する',
+          tableTitle: 'タイトル',
+          tableDate: '日付',
+          tableStatus: '状態',
+          statusDraft: '下書き',
+          statusPublished: '公開',
+          editLink: '編集',
+          deleteLink: '削除',
+          noPosts: '記事がありません。「新規記事」から追加してください。',
+          listError: '一覧の取得に失敗しました。writer-server が起動しているか確認してください。',
+          loadPostError: '記事の読み込みに失敗しました',
+          saving: '保存中…',
+          draftSaved: '下書きを保存しました',
+          saveFailed: '保存に失敗しました',
+          publishing: '公開中…（ビルドと push に少し時間がかかります）',
+          published: '公開しました。ブログで確認できます。',
+          publishFailed: '公開に失敗しました',
+          deleteFailed: '削除に失敗しました'
+        },
+        en: {
+          navBackToList: '← Post list',
+          navViewBlog: 'View blog',
+          listTitle: 'Post list',
+          btnNewPost: 'New post',
+          loading: 'Loading…',
+          editTitleNew: 'New post',
+          editTitleEdit: 'Edit post',
+          labelTitle: 'Title',
+          placeholderTitle: 'Post title',
+          labelDate: 'Date',
+          hintDate: 'Publish date (YYYY-MM-DD)',
+          labelCategories: 'Categories (comma-separated)',
+          placeholderCategories: 'Travel, Brazil',
+          hintCategories: 'e.g. Travel, Brazil',
+          labelExcerpt: 'Excerpt (optional, for list)',
+          placeholderExcerpt: 'First 1–2 sentences will show in the list',
+          labelBody: 'Body (Markdown OK)',
+          placeholderBody: 'Write your post here.\n\nImage: ![alt](images/photo.jpg)\nHeading: ## Heading',
+          hintMarkdown: 'Markdown: **bold** / ## heading / ![alt](images/file.jpg)',
+          btnSaveDraft: 'Save draft',
+          btnPublish: 'Publish',
+          btnInsertImage: 'Insert image',
+          bodyImagesTitle: 'Images in body',
+          bodyPreviewTitle: 'Preview',
+          imgRemove: 'Remove',
+          deleteModalTitle: 'Delete post',
+          deleteConfirmPrefix: 'Delete "',
+          deleteConfirmSuffix: '"? Are you sure?',
+          deleteConfirmLabel: 'Type "delete" to confirm',
+          deletePlaceholder: 'delete',
+          deleteCancel: 'Cancel',
+          deleteConfirm: 'Delete',
+          tableTitle: 'Title',
+          tableDate: 'Date',
+          tableStatus: 'Status',
+          statusDraft: 'Draft',
+          statusPublished: 'Published',
+          editLink: 'Edit',
+          deleteLink: 'Delete',
+          noPosts: 'No posts yet. Add one with "New post".',
+          listError: 'Failed to load list. Is writer-server running?',
+          loadPostError: 'Failed to load post',
+          saving: 'Saving…',
+          draftSaved: 'Draft saved',
+          saveFailed: 'Save failed',
+          publishing: 'Publishing… (build and push may take a moment)',
+          published: 'Published. You can check the blog.',
+          publishFailed: 'Publish failed',
+          deleteFailed: 'Delete failed'
+        }
+      };
+
+      var lang = (typeof localStorage !== 'undefined' && localStorage.getItem('writerLang')) || 'ja';
+      if (lang !== 'ja' && lang !== 'en') lang = 'ja';
+
+      function t(key) { return (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.ja[key] || key; }
+
+      function applyLang() {
+        document.documentElement.lang = lang;
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n');
+          if (key && el.id !== 'deleteConfirmTitle') el.textContent = t(key);
+        });
+        document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n-ph');
+          if (key) el.placeholder = t(key);
+        });
+        document.getElementById('deleteConfirmPrefix').textContent = t('deleteConfirmPrefix');
+        document.getElementById('deleteConfirmSuffix').textContent = t('deleteConfirmSuffix');
+        document.getElementById('langJa').classList.toggle('active', lang === 'ja');
+        document.getElementById('langJa').setAttribute('aria-pressed', lang === 'ja');
+        document.getElementById('langEn').classList.toggle('active', lang === 'en');
+        document.getElementById('langEn').setAttribute('aria-pressed', lang === 'en');
+        if (!listView.classList.contains('hidden')) loadList();
+        if (editView.classList.contains('hidden') === false) {
+          editTitleEl.textContent = slugInput.value ? t('editTitleEdit') : t('editTitleNew');
+        }
+      }
+
+      function setLang(newLang) {
+        lang = newLang;
+        try { localStorage.setItem('writerLang', lang); } catch (e) {}
+        applyLang();
+      }
+
       var listView = document.getElementById('listView');
       var editView = document.getElementById('editView');
       var listContent = document.getElementById('listContent');
@@ -104,6 +300,88 @@
       var bodyInput = document.getElementById('body');
       var saveStatus = document.getElementById('saveStatus');
       var editTitleEl = document.getElementById('editTitle');
+
+      document.getElementById('langJa').addEventListener('click', function () { setLang('ja'); });
+      document.getElementById('langEn').addEventListener('click', function () { setLang('en'); });
+      applyLang();
+
+      function getBodyImages(text) {
+        var out = [];
+        var m;
+        var reMd = /!\[([^\]]*)\]\(([^)]+)\)/g;
+        while ((m = reMd.exec(text)) !== null) {
+          out.push({ alt: m[1], url: m[2], raw: m[0] });
+        }
+        var reImg = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+        while ((m = reImg.exec(text)) !== null) {
+          var altMatch = m[0].match(/alt=["']([^"']*)["']/i);
+          out.push({ alt: altMatch ? altMatch[1] : '', url: m[1], raw: m[0] });
+        }
+        return out;
+      }
+
+      function updateBodyImagesAndPreview() {
+        var text = bodyInput.value;
+        var images = getBodyImages(text);
+        var listEl = document.getElementById('bodyImagesList');
+        var sectionEl = document.getElementById('bodyImagesSection');
+        listEl.innerHTML = '';
+        if (images.length) {
+          sectionEl.style.display = 'block';
+          images.forEach(function (img) {
+            var wrap = document.createElement('div');
+            wrap.className = 'body-images-item';
+            var im = document.createElement('img');
+            im.src = img.url;
+            im.alt = img.alt;
+            im.referrerPolicy = 'no-referrer';
+            im.onerror = function () { this.style.background = '#eee'; this.alt = img.url; };
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'img-remove';
+            btn.textContent = t('imgRemove');
+            btn.setAttribute('data-raw', img.raw);
+            btn.addEventListener('click', function () {
+              var raw = btn.getAttribute('data-raw');
+              bodyInput.value = bodyInput.value.replace(raw, '');
+              updateBodyImagesAndPreview();
+            });
+            wrap.appendChild(im);
+            wrap.appendChild(btn);
+            listEl.appendChild(wrap);
+          });
+        } else {
+          sectionEl.style.display = 'none';
+        }
+        var previewEl = document.getElementById('bodyPreviewContent');
+        var previewHtml = text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" referrerpolicy="no-referrer">');
+        previewEl.innerHTML = previewHtml.split(/\n/).join('<br>');
+      }
+
+      bodyInput.addEventListener('input', updateBodyImagesAndPreview);
+      bodyInput.addEventListener('change', updateBodyImagesAndPreview);
+
+      document.getElementById('btnInsertImage').addEventListener('click', function () {
+        var url = prompt(lang === 'ja' ? '画像のURLを入力' : 'Enter image URL');
+        if (url == null || !url.trim()) return;
+        url = url.trim();
+        var alt = prompt(lang === 'ja' ? '代替テキスト（任意）' : 'Alt text (optional)');
+        if (alt == null) return;
+        var insert = '![' + (alt || '') + '](' + url + ')';
+        var ta = bodyInput;
+        var start = ta.selectionStart;
+        var end = ta.selectionEnd;
+        var before = ta.value.slice(0, start);
+        var after = ta.value.slice(end);
+        ta.value = before + insert + after;
+        ta.selectionStart = ta.selectionEnd = start + insert.length;
+        ta.focus();
+        updateBodyImagesAndPreview();
+      });
 
       function slugFromTitle(s) {
         return String(s || '')
@@ -126,48 +404,45 @@
         listView.classList.add('hidden');
         editView.classList.remove('hidden');
         if (slug) {
-          editTitleEl.textContent = '記事を編集';
+          editTitleEl.textContent = t('editTitleEdit');
           loadPost(slug);
         } else {
-          editTitleEl.textContent = '新規記事';
+          editTitleEl.textContent = t('editTitleNew');
           slugInput.value = '';
           titleInput.value = '';
           dateInput.value = new Date().toISOString().slice(0, 10);
           categoriesInput.value = '';
           excerptInput.value = '';
           bodyInput.value = '';
+          updateBodyImagesAndPreview();
           saveStatus.textContent = '';
           saveStatus.className = 'save-status';
         }
       }
 
       function loadList() {
-        listContent.innerHTML = '読み込み中…';
-        fetch('/api/posts')
+        listContent.innerHTML = t('loading');
+        fetch(API_BASE + '/api/posts')
           .then(function (r) { return r.json(); })
           .then(function (posts) {
             if (!posts.length) {
-              listContent.innerHTML = '<p>記事がありません。「新規記事」から追加してください。</p>';
+              listContent.innerHTML = '<p>' + t('noPosts') + '</p>';
               return;
             }
-            var html = '<table class="post-list"><thead><tr><th>タイトル</th><th>日付</th><th>状態</th><th></th></tr></thead><tbody>';
+            var html = '<table class="post-list"><thead><tr><th>' + t('tableTitle') + '</th><th>' + t('tableDate') + '</th><th>' + t('tableStatus') + '</th><th></th></tr></thead><tbody>';
             posts.forEach(function (p) {
               var statusClass = p.status === 'draft' ? 'status-draft' : 'status-published';
-              var statusText = p.status === 'draft' ? '下書き' : '公開';
+              var statusText = p.status === 'draft' ? t('statusDraft') : t('statusPublished');
               html += '<tr><td>' + escapeHtml(p.title) + '</td><td>' + escapeHtml(p.date) + '</td><td class="' + statusClass + '">' + statusText + '</td><td class="actions">';
-              html += '<a href="#edit/' + escapeHtml(p.slug) + '">編集</a>';
-              html += '<button type="button" class="btn-danger" data-slug="' + escapeHtml(p.slug) + '" data-title="' + escapeHtml(p.title) + '">削除</button>';
+              html += '<a href="#edit/' + escapeHtml(p.slug) + '">' + t('editLink') + '</a>';
+              html += '<button type="button" class="btn-danger" data-slug="' + escapeHtml(p.slug) + '" data-title="' + escapeHtml(p.title) + '">' + t('deleteLink') + '</button>';
               html += '</td></tr>';
             });
             html += '</tbody></table>';
             listContent.innerHTML = html;
             listContent.querySelectorAll('button[data-slug]').forEach(function (btn) {
               btn.addEventListener('click', function () {
-                if (!confirm('「' + btn.getAttribute('data-title') + '」を削除しますか？')) return;
-                fetch('/api/posts/' + encodeURIComponent(btn.getAttribute('data-slug')), { method: 'DELETE' })
-                  .then(function (r) { return r.json(); })
-                  .then(function () { loadList(); })
-                  .catch(function () { alert('削除に失敗しました'); });
+                showDeleteConfirm(btn.getAttribute('data-slug'), btn.getAttribute('data-title'));
               });
             });
             listContent.querySelectorAll('a[href^="#edit/"]').forEach(function (a) {
@@ -180,14 +455,14 @@
             });
           })
           .catch(function () {
-            listContent.innerHTML = '<p class="save-status err">一覧の取得に失敗しました。writer-server が起動しているか確認してください。</p>';
+            listContent.innerHTML = '<p class="save-status err">' + t('listError') + '</p>';
           });
       }
 
       function loadPost(slug) {
-        saveStatus.textContent = '読み込み中…';
+        saveStatus.textContent = t('loading');
         saveStatus.className = 'save-status';
-        fetch('/api/posts/' + encodeURIComponent(slug))
+        fetch(API_BASE + '/api/posts/' + encodeURIComponent(slug))
           .then(function (r) {
             if (!r.ok) throw new Error('Not found');
             return r.json();
@@ -199,10 +474,11 @@
             categoriesInput.value = Array.isArray(p.categories) ? p.categories.join(', ') : (p.categories || '');
             excerptInput.value = p.excerpt || '';
             bodyInput.value = p.body || '';
+            updateBodyImagesAndPreview();
             saveStatus.textContent = '';
           })
           .catch(function () {
-            saveStatus.textContent = '記事の読み込みに失敗しました';
+            saveStatus.textContent = t('loadPostError');
             saveStatus.className = 'save-status err';
           });
       }
@@ -226,9 +502,9 @@
 
       document.getElementById('btnSaveDraft').addEventListener('click', function () {
         var data = getFormData();
-        saveStatus.textContent = '保存中…';
+        saveStatus.textContent = t('saving');
         saveStatus.className = 'save-status';
-        fetch('/api/posts/draft', {
+        fetch(API_BASE + '/api/posts/draft', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
@@ -240,18 +516,18 @@
               return;
             }
             slugInput.value = res.slug || data.slug;
-            setStatus('下書きを保存しました');
+            setStatus(t('draftSaved'));
           })
           .catch(function () {
-            setStatus('保存に失敗しました', true);
+            setStatus(t('saveFailed'), true);
           });
       });
 
       document.getElementById('btnPublish').addEventListener('click', function () {
         var data = getFormData();
-        saveStatus.textContent = '公開中…（ビルドと push に少し時間がかかります）';
+        saveStatus.textContent = t('publishing');
         saveStatus.className = 'save-status';
-        fetch('/api/posts/publish', {
+        fetch(API_BASE + '/api/posts/publish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
@@ -263,10 +539,10 @@
               return;
             }
             slugInput.value = res.slug || data.slug;
-            setStatus('公開しました。ブログで確認できます。');
+            setStatus(t('published'));
           })
           .catch(function () {
-            setStatus('公開に失敗しました', true);
+            setStatus(t('publishFailed'), true);
           });
       });
 
@@ -278,7 +554,7 @@
         e.preventDefault();
         window.open(backToBlog.href, '_blank');
       });
-      fetch('/api/config').then(function (r) { return r.json(); }).then(function (c) {
+      fetch(API_BASE + '/api/config').then(function (r) { return r.json(); }).then(function (c) {
         if (c.siteUrl) backToBlog.href = c.siteUrl;
       }).catch(function () {});
 
@@ -291,6 +567,42 @@
         div.textContent = s;
         return div.innerHTML;
       }
+
+      var deleteConfirmSlug = null;
+
+      function showDeleteConfirm(slug, title) {
+        deleteConfirmSlug = slug;
+        document.getElementById('deleteConfirmTitle').textContent = title || slug;
+        document.getElementById('deleteConfirmInput').value = '';
+        document.getElementById('deleteConfirmInput').placeholder = t('deletePlaceholder');
+        document.getElementById('deleteConfirmBtn').disabled = true;
+        document.getElementById('deleteOverlay').classList.remove('hidden');
+        document.getElementById('deleteConfirmInput').focus();
+      }
+
+      function hideDeleteConfirm() {
+        document.getElementById('deleteOverlay').classList.add('hidden');
+        deleteConfirmSlug = null;
+      }
+
+      document.getElementById('deleteConfirmInput').addEventListener('input', function () {
+        document.getElementById('deleteConfirmBtn').disabled = this.value.trim() !== t('deletePlaceholder');
+      });
+
+      document.getElementById('deleteConfirmBtn').addEventListener('click', function () {
+        if (this.disabled || !deleteConfirmSlug) return;
+        var slug = deleteConfirmSlug;
+        hideDeleteConfirm();
+        fetch(API_BASE + '/api/posts/' + encodeURIComponent(slug), { method: 'DELETE' })
+          .then(function (r) { return r.json(); })
+          .then(function () { loadList(); })
+          .catch(function () { alert(t('deleteFailed')); });
+      });
+
+      document.getElementById('deleteCancelBtn').addEventListener('click', hideDeleteConfirm);
+      document.getElementById('deleteOverlay').addEventListener('click', function (e) {
+        if (e.target === this) hideDeleteConfirm();
+      });
 
       function onHashChange() {
         var hash = (location.hash || '').replace(/^#/, '');
