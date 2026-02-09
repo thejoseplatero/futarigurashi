@@ -277,7 +277,7 @@ function handleSave(body, res) {
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.writeHead(204);
     res.end();
@@ -376,53 +376,60 @@ const server = http.createServer((req, res) => {
       return;
     }
     if (req.method === 'DELETE') {
-      // Try both raw suffix and slugify so we match the actual filename (client sends list slug)
-      const slugCandidates = [
-        suffix.replace(/^\/+|\/+$/g, '').replace(/\.\./g, '').replace(/\//g, '').trim(),
-        slugify(suffix)
-      ].filter(Boolean);
-      const slug = slugCandidates[0] || 'post';
-      let removed = false;
-      let usedSlug = null;
-      for (const dir of [DRAFTS_DIR, CONTENT_DIR]) {
-        for (const trySlug of slugCandidates) {
-          const filePath = path.join(dir, trySlug + '.md');
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-            removed = true;
-            usedSlug = trySlug;
-            if (dir === CONTENT_DIR) {
-              // Update posts.json and remove post HTML immediately so list refreshes even if build fails
-              if (fs.existsSync(POSTS_JSON)) {
-                try {
-                  let list = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8'));
-                  list = list.filter((p) => p.slug !== trySlug);
-                  fs.mkdirSync(DATA_DIR, { recursive: true });
-                  fs.writeFileSync(POSTS_JSON, JSON.stringify(list, null, 2), 'utf8');
-                } catch (e) {
-                  // ignore
+      try {
+        // Try both raw suffix and slugify so we match the actual filename (client sends list slug)
+        const slugCandidates = [
+          suffix.replace(/^\/+|\/+$/g, '').replace(/\.\./g, '').replace(/\//g, '').trim(),
+          slugify(suffix)
+        ].filter(Boolean);
+        const slug = slugCandidates[0] || 'post';
+        let removed = false;
+        let usedSlug = null;
+        for (const dir of [DRAFTS_DIR, CONTENT_DIR]) {
+          for (const trySlug of slugCandidates) {
+            const filePath = path.join(dir, trySlug + '.md');
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+              removed = true;
+              usedSlug = trySlug;
+              if (dir === CONTENT_DIR) {
+                // Update posts.json and remove post HTML immediately so list refreshes even if build fails
+                if (fs.existsSync(POSTS_JSON)) {
+                  try {
+                    let list = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8'));
+                    if (Array.isArray(list)) {
+                      list = list.filter((p) => p && p.slug !== trySlug);
+                      fs.mkdirSync(DATA_DIR, { recursive: true });
+                      fs.writeFileSync(POSTS_JSON, JSON.stringify(list, null, 2), 'utf8');
+                    }
+                  } catch (e) {
+                    console.error('Update posts.json after delete:', e.message);
+                  }
+                }
+                const htmlPath = path.join(POSTS_DIR, trySlug + '.html');
+                if (fs.existsSync(htmlPath)) fs.unlinkSync(htmlPath);
+                const buildResult = runBuild();
+                if (!buildResult.ok) {
+                  console.error('Build failed after delete:', buildResult.stderr);
+                }
+                const pushResult = runGitPush('Delete post: ' + trySlug);
+                if (!pushResult.ok) {
+                  console.error('Push failed after delete:', pushResult.error);
                 }
               }
-              const htmlPath = path.join(POSTS_DIR, trySlug + '.html');
-              if (fs.existsSync(htmlPath)) fs.unlinkSync(htmlPath);
-              const buildResult = runBuild();
-              if (!buildResult.ok) {
-                console.error('Build failed after delete:', buildResult.stderr);
-              }
-              const pushResult = runGitPush('Delete post: ' + trySlug);
-              if (!pushResult.ok) {
-                console.error('Push failed after delete:', pushResult.error);
-              }
+              break;
             }
-            break;
           }
+          if (removed) break;
         }
-        if (removed) break;
-      }
-      if (removed) {
-        jsonResponse(res, 200, { deleted: true, slug: usedSlug || slug });
-      } else {
-        jsonResponse(res, 404, { error: 'Not found' });
+        if (removed) {
+          jsonResponse(res, 200, { deleted: true, slug: usedSlug || slug });
+        } else {
+          jsonResponse(res, 404, { error: 'Not found' });
+        }
+      } catch (err) {
+        console.error('DELETE error:', err);
+        jsonResponse(res, 500, { error: 'Delete failed', detail: err.message });
       }
       return;
     }
