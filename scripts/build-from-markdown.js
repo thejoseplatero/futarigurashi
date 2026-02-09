@@ -161,8 +161,8 @@ function parseFrontmatter(raw) {
       key = kv[1].toLowerCase();
       const v = kv[2].trim().replace(/^["']|["']$/g, '');
       if (key === 'categories') {
-        meta.categories = [v];
-        if (v) list = meta.categories;
+        meta.categories = v ? [v] : [];
+        list = meta.categories;
       } else {
         meta[key] = v;
       }
@@ -254,17 +254,7 @@ function main() {
       console.warn('marked not available, using plain text for body');
     }
   }
-  let postsData = [];
-  if (fs.existsSync(POSTS_JSON)) {
-    try {
-      postsData = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8'));
-    } catch (e) {
-      console.error('Could not read', POSTS_JSON, e.message);
-      process.exit(1);
-    }
-  }
-  const bySlug = new Map(postsData.map((p) => [p.slug, { ...p }]));
-
+  const bySlug = new Map();
   if (fs.existsSync(CONTENT_DIR)) {
     const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.endsWith('.md'));
     for (const file of files) {
@@ -292,10 +282,21 @@ function main() {
     console.log('Processed', files.length, 'Markdown files from content/');
   }
 
-  postsData = [...bySlug.values()].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const postsData = [...bySlug.values()].sort((a, b) => new Date(b.date) - new Date(a.date));
   fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(POSTS_JSON, JSON.stringify(postsData, null, 2), 'utf8');
   console.log('Wrote', POSTS_JSON, '(' + postsData.length, 'posts)');
+
+  if (fs.existsSync(POSTS_DIR)) {
+    const existing = fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith('.html'));
+    for (const file of existing) {
+      const slug = file.slice(0, -5);
+      if (!bySlug.has(slug)) {
+        fs.unlinkSync(path.join(POSTS_DIR, file));
+        console.log('Removed orphan post:', file);
+      }
+    }
+  }
 
   const totalPages = Math.ceil(postsData.length / PER_PAGE);
   const indexPath = path.join(ROOT, 'index.html');

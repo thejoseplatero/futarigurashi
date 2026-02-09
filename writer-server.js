@@ -376,7 +376,8 @@ const server = http.createServer((req, res) => {
       return;
     }
     if (req.method === 'DELETE') {
-      const slug = slugify(suffix) || 'post';
+      // Use decoded suffix as slug so we match the actual filename (slugify strips dots etc.)
+      const slug = (suffix.replace(/\//g, '').replace(/\.\./g, '').trim() || 'post');
       let removed = false;
       for (const dir of [DRAFTS_DIR, CONTENT_DIR]) {
         const filePath = path.join(dir, slug + '.md');

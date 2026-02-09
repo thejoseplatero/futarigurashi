@@ -37,6 +37,7 @@
     .post-list .status-published { color: #0a6b0a; font-size: 0.85rem; }
     .post-list .actions { white-space: nowrap; }
     .post-list .actions a, .post-list .actions button { margin-right: 0.5rem; font-size: 0.9rem; }
+    .post-list .post-list-categories { font-size: 0.85rem; color: var(--color-text-muted); max-width: 12rem; }
     .writer-nav { display: flex; gap: var(--space-m); margin-bottom: var(--space-m); flex-wrap: wrap; align-items: center; }
     .writer-nav a { font-size: 0.9rem; }
     .writer-lang { margin-left: auto; font-size: 0.85rem; }
@@ -183,6 +184,7 @@
           deleteCancel: 'キャンセル',
           deleteConfirm: '削除する',
           tableTitle: 'タイトル',
+          tableCategories: 'カテゴリー',
           tableDate: '日付',
           tableStatus: '状態',
           statusDraft: '下書き',
@@ -235,6 +237,7 @@
           deleteCancel: 'Cancel',
           deleteConfirm: 'Delete',
           tableTitle: 'Title',
+          tableCategories: 'Categories',
           tableDate: 'Date',
           tableStatus: 'Status',
           statusDraft: 'Draft',
@@ -443,11 +446,13 @@
               listContent.innerHTML = '<p>' + t('noPosts') + '</p>';
               return;
             }
-            var html = '<table class="post-list"><thead><tr><th>' + t('tableTitle') + '</th><th>' + t('tableDate') + '</th><th>' + t('tableStatus') + '</th><th></th></tr></thead><tbody>';
+            var html = '<table class="post-list"><thead><tr><th>' + t('tableTitle') + '</th><th>' + t('tableCategories') + '</th><th>' + t('tableDate') + '</th><th>' + t('tableStatus') + '</th><th></th></tr></thead><tbody>';
             posts.forEach(function (p) {
+              var cats = Array.isArray(p.categories) ? p.categories : (p.categories ? [p.categories] : []);
+              var categoriesText = cats.map(function (c) { return escapeHtml(String(c)); }).join(', ');
               var statusClass = p.status === 'draft' ? 'status-draft' : 'status-published';
               var statusText = p.status === 'draft' ? t('statusDraft') : t('statusPublished');
-              html += '<tr><td>' + escapeHtml(p.title) + '</td><td>' + escapeHtml(p.date) + '</td><td class="' + statusClass + '">' + statusText + '</td><td class="actions">';
+              html += '<tr><td>' + escapeHtml(p.title) + '</td><td class="post-list-categories">' + categoriesText + '</td><td>' + escapeHtml(p.date) + '</td><td class="' + statusClass + '">' + statusText + '</td><td class="actions">';
               html += '<a href="#edit/' + escapeHtml(p.slug) + '">' + t('editLink') + '</a>';
               html += '<button type="button" class="btn-danger" data-slug="' + escapeHtml(p.slug) + '" data-title="' + escapeHtml(p.title) + '">' + t('deleteLink') + '</button>';
               html += '</td></tr>';
