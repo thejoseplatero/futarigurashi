@@ -1,0 +1,59 @@
+---
+title: "毎日の手作りが楽しく簡単に～MagicBullet～"
+date: 2009-03-20
+categories:
+  - マジックブレット
+  - 買ってよかったもの
+excerpt: "カナダでは、知名度も高く、我が家にもあるよ、というひとが意外と多いマジックブレットは、私が買ってよかったとおもうもののひとつ。我が家では使用頻度が高いため、キッチンの一番手に届きやすい、すぐだせるところに収納されている。コンパクトなのでいわゆる今どきのコンドの我が家の狭いキッチンでも場所をとらないところがいい。 日本ではよくテレビのＣＭでみてずっと気になっていたが、便利そうだなあ、あったらいいだろうなあ、と思う反面、使うかどうか確信がも…"
+---
+
+<img loading="lazy" class="alignnone size-full wp-image-2706" title="the-magic-bullet" src="http://futarigurashiphoto.files.wordpress.com/2011/02/the-magic-bullet.jpg" alt="the-magic-bullet" width="400" height="350" />
+
+カナダでは、知名度も高く、我が家にもあるよ、というひとが意外と多いマジックブレットは、私が買ってよかったとおもうもののひとつ。我が家では使用頻度が高いため、キッチンの一番手に届きやすい、すぐだせるところに収納されている。コンパクトなのでいわゆる今どきのコンドの我が家の狭いキッチンでも場所をとらないところがいい。
+
+日本ではよくテレビのＣＭでみてずっと気になっていたが、便利そうだなあ、あったらいいだろうなあ、と思う反面、使うかどうか確信がもてなかったため、買わずに躊躇していた。
+
+そしてある日のこと、ダウンタウンのYongeStreetを歩いていたら、店頭に掲げられたマジックブレット大特価３５ドルと書かれた張り紙が目に留まった。その店はYongeStreetによくある電気関係のものを中心にお土産などのこまごましたものを売っているが、一言で何屋というのかはよくわからない店。
+
+調べてみたら、フルセットが３５ドルというのは大変お買い得な値段だといういうことがわかり、数日後その店に戻り、購入。
+
+そして調子よく使っていたが、購入してから１年を目前にして、本体が壊れてしまった。
+
+まだ保障期間内だったので製造している会社に連絡をとったところ、
+私の持っていたものはなんと偽造品だったということが判明！！もちろん修理は受け付けてくれなかった。
+
+３４ドルで１年近くたっぷり使ったのだからまあそれはいいとしても、マジックブレット自体は大変気に入って毎日のように使っていて、もはや我が家ではなくてはならない存在となっていた。それで、たくさんついてくる付属品はまだ全て問題なく使えたので新しく本体のみを購入ようと試みたが、どうやらそれは無理な様子。
+
+その後ほどなくしてCanadianTireにて、シングルショットのタイプが売られているのをみつけすぐに購入。フルセットよりついてくる付属品が少なく、その分値段もリーズナブル。
+
+使った感想については、付属の説明書に載っているレシピをまだ全てためしたわけではないが、これができます、と謳っていることが全てできるわけではなかった。まず、玉ねぎのみじんぎり。こつがあるのかもしれないが、いまいち。摩り下ろし状になってしまう。というわけで摩り下ろしは得意な作業で、大根おろしは簡単にできる。肉をひき肉にするのもいまいちだが、いわしのつみれをつくるにはいいのかも。
+
+とはいえ、我が家では毎日大活躍。
+
+ベランダで育ち、大量に収穫できたバジルの葉でバジルペーストを作ったり、すりごまやパン粉はごまやパンがあれば必要な分だけすぐできるのでもはや買いおきする必要がなくなった。
+
+サラダのドレッシングや、焼肉のたれはもちろんのこと、ベランダでとれたしその葉を電子レンジで乾燥させ、自家製ふりかけをつくったり。<a href="http://www.futarigurashi.com/2012/11/%E7%B0%A1%E5%8D%98%EF%BC%81%E6%B7%B7%E3%81%9C%E3%82%8B%E3%81%A0%E3%81%91%E3%81%AE%E6%89%8B%E4%BD%9C%E3%82%8A%E7%B2%97%E6%8C%BD%E3%81%8D%E7%B2%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%89%E3%81%AE/">自家製粒マスタードも簡単にできる（過去記事へ）</a>。買ってもいいが、簡単にできて、手作りしたもののほうがおいしいものって結構あるが、マジックブレットは毎日の手作りを断然簡単にしてくれる強い味方なのだ。大好きなスムージーやフローズンカクテルが簡単にできるのもうれしい。
+
+<img loading="lazy" class=" wp-image-2702 alignnone" title="ginger1" src="http://futarigurashiphoto.files.wordpress.com/2011/02/ginger1.jpg" alt="ginger1" width="276" height="208" />
+
+↑なかなか使い切れないしょうがはマジックブレットですりおろす。ジップロックに入れてなるべく薄く平らにしてから凍らせておくと、使いたいときにぱきっと折って使えてとても便利。おろし金ですりおろすより労力も時間も少なくてすみずっと簡単。
+
+&nbsp;
+<div style="width: 300px; border: 1px solid #ccc;">
+<div>
+<div style="font-size: 12px; padding: 10px; border-style: none;">
+<p style="padding: 0; margin: 0;"><a href="https://rpx.a8.net/svt/ejp?a8mat=1U7HZE+3WIBJM+2HOM+BWGDT&amp;rakuten=y&amp;a8ejpredirect=https%3A%2F%2Fhb.afl.rakuten.co.jp%2Fhgc%2Fg00ppmm4.2bo11f37.g00ppmm4.2bo12225%2Fa09082145081_1U7HZE_3WIBJM_2HOM_BWGDT%3Fpc%3Dhttps%253A%252F%252Fitem.rakuten.co.jp%252Fshopjapan%252Fmgtxh%252F%26m%3Dhttp%253A%252F%252Fm.rakuten.co.jp%252Fshopjapan%252Fi%252F10000104%252F" rel="nofollow">マジックブレット デラックス＜ブラック・パールピンク＞【ショップジャパン】【正規品】【ミキサー】【マジックブレッド】【マジブレ】マジックブレッド フードプロセッサー コンパクト 小型ミキサー</a></p>
+<p style="color: #666; margin-top: 5px line-height:1.5;">価格:<span style="font-size: 14px; color: #c00; font-weight: bold;">10,780円</span>
+<span style="font-size: 10px; font-weight: normal;">(2022/4/15 01:15時点)</span>
+<span style="font-weight: bold;">感想(817件)</span></p>
+
+</div>
+</div>
+</div>
+<img loading="lazy" src="https://www19.a8.net/0.gif?a8mat=1U7HZE+3WIBJM+2HOM+BWGDT" alt="" width="1" height="1" border="0" />
+
+<a href="http://overseas.blogmura.com/toronto/"><img loading="lazy" src="http://overseas.blogmura.com/toronto/img/toronto88_31.gif" alt="にほんブログ村 海外生活ブログ トロント情報へ" width="88" height="31" border="0" /></a>
+<a href="http://overseas.blogmura.com/toronto/">にほんブログ村</a>
+
+<a href="http://overseas.blogmura.com/canada/"><img loading="lazy" src="http://overseas.blogmura.com/canada/img/canada88_31.gif" alt="にほんブログ村 海外生活ブログ カナダ情報へ" width="88" height="31" border="0" /></a>
+<a href="http://overseas.blogmura.com/canada/">にほんブログ村</a>

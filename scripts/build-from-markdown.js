@@ -241,6 +241,7 @@ function buildPagination(pageNum, totalPages, baseUrl) {
 }
 
 function markdownToHtml(text) {
+  // marked passes through raw HTML (e.g. migrated posts with HTML body).
   if (marked) return marked.parse(String(text || ''), { async: false });
   return String(text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>\n');
 }

@@ -87,6 +87,7 @@
     <div class="writer-nav">
       <a href="#" id="backToList" class="writer-back" data-i18n="navBackToList">← 記事一覧</a>
       <a href="#" id="backToBlog" class="writer-back" data-i18n="navViewBlog">ブログを見る</a>
+      <span class="writer-api-hint" id="apiHint" style="display: none; font-size: 0.8rem; color: var(--color-text-muted);"></span>
       <span class="writer-lang">
         <button type="button" id="langJa" aria-pressed="true">日本語</button>
         <span aria-hidden="true"> / </span>
@@ -190,6 +191,7 @@
           deleteLink: '削除',
           noPosts: '記事がありません。「新規記事」から追加してください。',
           listError: '一覧の取得に失敗しました。writer-server が起動しているか確認してください。',
+          apiHint: 'writer-server を port 3765 で起動してください: node writer-server.js',
           loadPostError: '記事の読み込みに失敗しました',
           saving: '保存中…',
           draftSaved: '下書きを保存しました',
@@ -241,6 +243,7 @@
           deleteLink: 'Delete',
           noPosts: 'No posts yet. Add one with "New post".',
           listError: 'Failed to load list. Is writer-server running?',
+          apiHint: 'Start writer-server on port 3765: node writer-server.js',
           loadPostError: 'Failed to load post',
           saving: 'Saving…',
           draftSaved: 'Draft saved',
@@ -273,6 +276,13 @@
         document.getElementById('langJa').setAttribute('aria-pressed', lang === 'ja');
         document.getElementById('langEn').classList.toggle('active', lang === 'en');
         document.getElementById('langEn').setAttribute('aria-pressed', lang === 'en');
+        var hintEl = document.getElementById('apiHint');
+        if (API_BASE) {
+          hintEl.style.display = 'inline';
+          hintEl.textContent = t('apiHint');
+        } else {
+          hintEl.style.display = 'none';
+        }
         if (!listView.classList.contains('hidden')) loadList();
         if (editView.classList.contains('hidden') === false) {
           editTitleEl.textContent = slugInput.value ? t('editTitleEdit') : t('editTitleNew');
@@ -423,8 +433,12 @@
       function loadList() {
         listContent.innerHTML = t('loading');
         fetch(API_BASE + '/api/posts')
-          .then(function (r) { return r.json(); })
+          .then(function (r) {
+            if (!r.ok) throw new Error('API ' + r.status);
+            return r.json();
+          })
           .then(function (posts) {
+            if (!Array.isArray(posts)) throw new Error('Invalid response');
             if (!posts.length) {
               listContent.innerHTML = '<p>' + t('noPosts') + '</p>';
               return;
@@ -454,8 +468,14 @@
               });
             });
           })
-          .catch(function () {
-            listContent.innerHTML = '<p class="save-status err">' + t('listError') + '</p>';
+          .catch(function (err) {
+            var msg = t('listError');
+            if (API_BASE && (err.message === 'Failed to fetch' || err.name === 'TypeError')) {
+              msg = (lang === 'ja' ? 'writer-server に接続できません。ターミナルで「node writer-server.js」を実行してから再読み込みしてください。（port 3765）' : 'Cannot reach writer-server. Run "node writer-server.js" in the futarigurashi folder, then reload. (port 3765)');
+            } else if (err.message && err.message.indexOf('API') === 0) {
+              msg = (lang === 'ja' ? 'API エラー: ' : 'API error: ') + err.message;
+            }
+            listContent.innerHTML = '<p class="save-status err">' + msg + '</p>';
           });
       }
 

@@ -1,0 +1,59 @@
+---
+title: "Tim Tamのチーズケーキ"
+date: 2009-10-14
+categories:
+  - オーストラリア
+excerpt: "↑ ご機嫌な機体。でも機内サービスはすべて有料。飲み物１杯すらでてこない。だから運賃も安いのだけれど。 シドニーから１時間のフライトでブリスベンに着き、さらに車で１時間、今回の旅の最終目的地であるサンシャインコーストのCaloundraにやっと到着。 ここでは、J次郎の友人のカナダ育ちのカナダ人（でも国籍上オーストラリア人でもある）のJちゃんとその彼のオージーのC君のお宅にお世話になる。 Jちゃんの飼っている猫。オスで、生後６ヶ月の好奇…"
+---
+
+<img loading="lazy" class="alignnone size-medium wp-image-6366" title="caloundra" src="http://futarigurashiphoto.files.wordpress.com/2011/02/caloundra-300x225.jpg" alt="caloundra" width="300" height="225" />
+
+↑　ご機嫌な機体。でも機内サービスはすべて有料。飲み物１杯すらでてこない。だから運賃も安いのだけれど。
+
+シドニーから１時間のフライトでブリスベンに着き、さらに車で１時間、今回の旅の最終目的地であるサンシャインコーストのCaloundraにやっと到着。
+
+ここでは、J次郎の友人のカナダ育ちのカナダ人（でも国籍上オーストラリア人でもある）のJちゃんとその彼のオージーのC君のお宅にお世話になる。
+
+Jちゃんの飼っている猫。オスで、生後６ヶ月の好奇心旺盛なお年頃。
+
+<img loading="lazy" class="alignnone size-medium wp-image-6372" title="caloundra7" src="http://futarigurashiphoto.files.wordpress.com/2011/02/caloundra7-225x300.jpg" alt="caloundra7" width="225" height="300" />
+
+彼女の家はビーチから歩いて５分。さっそく海へと向かった。
+
+↓　ビーチへ行く途中の道端にいる犬。すっかりくつろいでいる様子。つながれていないし、飼い主らしきひともみあたらない。なんとものどかなところなのだ。
+
+<img loading="lazy" class="alignnone size-medium wp-image-6371" title="caloundra6" src="http://futarigurashiphoto.files.wordpress.com/2011/02/caloundra6-300x225.jpg" alt="caloundra6" width="300" height="225" />
+
+<img loading="lazy" class="alignnone size-medium wp-image-6370" title="caloundra5" src="http://futarigurashiphoto.files.wordpress.com/2011/02/caloundra5-300x225.jpg" alt="caloundra5" width="300" height="225" />
+
+このあたりは海岸沿いに遊歩道が充実していて、次のビーチまで景色を楽しみながら散歩ができる。
+
+Caloundraは閑静な住宅街の広がるエリア。ビーチ近くにある商店街もこじんまり。だが、あなどれない。
+
+ここに１件ある肉屋の肉はおいしい。オージービーフや、ラム肉のソーセージのおいしかったこと。
+
+洋服も心をくすぐるようなセンスの良いショップを１件みつけ、それだけでここに住みたくなった。
+
+さらに、カフェでは、Tim Tamのチーズケーキもみつけた。
+
+<img loading="lazy" class="alignnone size-medium wp-image-6369" title="caloundra4" src="http://futarigurashiphoto.files.wordpress.com/2011/02/caloundra4-300x225.jpg" alt="caloundra4" width="300" height="225" />
+
+ティムタムとは何か。
+
+それは、これ↓。チョコレート菓子。
+
+<img loading="lazy" class="alignnone size-medium wp-image-6367" title="caloundra1" src="http://futarigurashiphoto.files.wordpress.com/2011/02/caloundra1-300x225.jpg" alt="caloundra1" width="300" height="225" />
+
+私は日本にいたとき、オーストラリア土産で以前たべたことがあったが、J次郎は初めて。カナダではあまり知られていない様子。まあ、お土産文化の差もあるし、カナダからオーストラリアへ行く人はなかなかいないか。
+
+<img loading="lazy" class="alignnone size-medium wp-image-6368" title="caloundra2" src="http://futarigurashiphoto.files.wordpress.com/2011/02/caloundra2-300x225.jpg" alt="caloundra2" width="300" height="225" />
+
+後日WoolWorthsというスーパーへ行ったところセールになっているのをみつけ、一箱1.99ドルで８箱も購入し、トロントへ持ち帰った。キャラメル風味などのいろいろなバリエーションがあった。
+
+その後、私とJ次郎の皮下脂肪に、しっかりと蓄えられた様子。
+
+<a href="http://overseas.blogmura.com/canada/"><img loading="lazy" src="http://overseas.blogmura.com/canada/img/canada88_31.gif" border="0" alt="にほんブログ村 海外生活ブログ カナダ情報へ" width="88" height="31" /></a>
+<a href="http://overseas.blogmura.com/canada/">にほんブログ村</a>
+
+<a href="http://px.a8.net/svt/ejp?a8mat=1I6MFA+H9LBM+1XTW+609HU" target="_blank" rel="noopener">タレントの「スザ○ヌ」も大好きな熊本名物とは!?</a>
+<img loading="lazy" src="http://www15.a8.net/0.gif?a8mat=1I6MFA+H9LBM+1XTW+609HU" border="0" alt="" width="1" height="1" />

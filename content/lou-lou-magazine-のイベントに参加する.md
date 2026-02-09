@@ -1,0 +1,14 @@
+---
+title: "LOU LOU Magazine のイベントに参加する"
+date: 2011-10-04
+categories:
+  - Arts and Entertainment
+excerpt: "少し前のこと。 LOU LOU という雑誌のイベントがあった。 誰でも参加できるイベントで、事前に予約しておくと↓の各協賛店においてプロによるメイクアップなどの優待が受けられる。 各店では、スイーツや飲み物が振舞われたり、一定額買い物するとおまけがついてくるほか、買わなくても何かもらえる店も。 ↓小サイズのエコバッグに入っていた本屋の Indigo でもらったリップクリーム。 せっかくだから、私もセフォラでメイクしてもらうことに。 メイ…"
+---
+
+<p>少し前のこと。<span style="color: #ff00ff;"><a href="http://www.louloumagazine.com/english/"><span style="color: #ff00ff;">LOU LOU</span></a></span>という雑誌のイベントがあった。</p><p><img loading="lazy" alt="" src="http://futarigurashiphoto.files.wordpress.com/2011/10/louloumagazine21.jpg" width="288" height="432" /></p><p>誰でも参加できるイベントで、事前に予約しておくと↓の各協賛店においてプロによるメイクアップなどの優待が受けられる。<br>
+<img loading="lazy" alt="" src="http://futarigurashiphoto.files.wordpress.com/2011/10/louloumagazine3.jpg" width="288" height="432" /></p><p>各店では、スイーツや飲み物が振舞われたり、一定額買い物するとおまけがついてくるほか、買わなくても何かもらえる店も。</p><p>↓小サイズのエコバッグに入っていた本屋の<span style="color: #000080;"><a href="http://www.chapters.indigo.ca/home/?s_campaign=goo-Corporate-E&amp;gclid=CJOxneq1zKsCFY4KKgodPTIh0A"><span style="color: #000080;">Indigo</span></a></span>でもらったリップクリーム。<br>
+<img loading="lazy" alt="" src="http://futarigurashiphoto.files.wordpress.com/2011/10/louloumagazine1.jpg" /></p><p>せっかくだから、私もセフォラでメイクしてもらうことに。</p><p>メイクはアイメイクかリップメイクか選べたけれど、みなアイメイクをお願いするなか、私はリップメイクをお願いしてみた。そしたら真っ赤な唇にテカテカグロスで、まるでホラー映画。</p><p>でも、まわりのひとにはなぜか評判で、担当してくれたメイクアップアーチストはあなたにすごく似合うとべた褒め。メイクしてもらう列に並んでいたひとたちにも褒められた。</p><p>店内の特設のインスタントフォトブースで記念に写真をとった後は、セフォラの並びの<span style="color: #ff6600;"><a href="http://www.jftor.org/"><span style="color: #ff6600;">Japan Foundation</span></a></span>と同じビルの中にある<span style="color: #800000;"><a href="http://lasociete.ca/"><span style="color: #800000;">La Societe Bistro</span></a></span>へ。<br>
+ここはフランスによくあるビストロそのまま。</p><p>イベントの参加者は入り口でドリンクチケットをもらえた。私はワインを。ワインはもちろんフランス産。Ｊ次郎はフランスのビール、１６６４。大きなグラスに並々とそそがれてきた。</p><p>店内はそれはそれは込んでいて最初は立っていたけれどそのうちなんとかバーカウンターに座ることができた。</p><p>すると、きれいな妙齢の女性が飲み物を注文にきたとき、あなたのリップのメイク素敵ね、あなたとてもきれいよとまたもや褒められ、さらにいい気分。彼女のほうこそすごく魅力的できれいだとおもったけれど。きれいなひとは余裕があるものなのだ。</p><p>イベントのカメラマンがやってきてカメラを向けられた酔っ払いＪ次郎はもはやわけわからないことを口走っていた。</p><p>店をでたらすっかり雨はやんでいた。とても楽しい夜だった。</p><p>来年も是非参加したいイベントなので、家に帰ったらすぐ、来年のお知らせがくるのを期待して、<span style="color: #ff00ff;"><a href="http://www.louloumagazine.com/english/"><span style="color: #ff00ff;">LOU LOU</span></a></span>のニュースレターに登録しておいた。</p><p><a href="http://overseas.blogmura.com/toronto/"><img loading="lazy" alt="にほんブログ村 海外生活ブログ トロント情報へ" src="http://overseas.blogmura.com/toronto/img/toronto88_31.gif" width="88" height="31" border="0" /></a><br>
+<a href="http://overseas.blogmura.com/toronto/">にほんブログ村</a></p><p><a href="http://overseas.blogmura.com/canada/"><img loading="lazy" alt="にほんブログ村 海外生活ブログ カナダ情報へ" src="http://overseas.blogmura.com/canada/img/canada88_31.gif" width="88" height="31" border="0" /></a><br>
+<a href="http://overseas.blogmura.com/canada/">にほんブログ村</a></p>

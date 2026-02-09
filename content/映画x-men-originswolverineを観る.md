@@ -1,0 +1,38 @@
+---
+title: "映画X-Men Origins:wolverineを観る"
+date: 2009-05-08
+categories:
+  - Arts and Entertainment
+excerpt: "ウルヴァリン：X-MEN ZERO〔初回生産限定：デジタル・コピー付＋キラーパッケージ仕様〕 [Blu-ray] 新品価格 ￥2,978 から (2013/7/5 07:31時点) Yonge&Dundasの交差点にあるAMCでX-Men Origins:Wolverineを観た。 公開された最初の週末だったので、上映された部屋は大きく、スクリーンは巨大で、迫力満点だった。 今週Ellen Degeneresショーをみていたら、主演のヒ…"
+---
+
+<table cellpadding="0" cellspacing="0" border="0" style=" border:1px solid #ccc; width:90px;"><tr style="border-style:none;"><td style="vertical-align:top; border-style:none; padding:10px 10px 0pt;"><a href="http://px.a8.net/svt/ejp?a8mat=1NWF49+F9J44Y+249K+BWGDT&a8ejpredirect=http%3A%2F%2Fwww.amazon.co.jp%2Fdp%2FB002UHJ9GW%2F%3Ftag%3Da8-affi-140598-22" target="_blank" rel="noopener"><img loading="lazy" border="0" alt="" src="http://ecx.images-amazon.com/images/I/516pDo255YL._SS80_.jpg" /></a></td></tr><tr style="border-style:none;"><td style="font-size:12px; vertical-align:middle; border-style:none; padding:10px;"><p style="padding:0; margin:0;"><a href="http://px.a8.net/svt/ejp?a8mat=1NWF49+F9J44Y+249K+BWGDT&a8ejpredirect=http%3A%2F%2Fwww.amazon.co.jp%2Fdp%2FB002UHJ9GW%2F%3Ftag%3Da8-affi-140598-22" target="_blank" rel="noopener">ウルヴァリン：X-MEN ZERO〔初回生産限定：デジタル・コピー付＋キラーパッケージ仕様〕 [Blu-ray]</a></p><p style="color:#cc0000; font-weight:bold; margin-top:10px;">新品価格<br/>￥2,978<span style="font-weight:normal;">から</span><br/><span style="font-size:10px; font-weight:normal;">(2013/7/5 07:31時点)</span></p></td></tr></table>
+<img loading="lazy" border="0" width="1" height="1" src="http://www14.a8.net/0.gif?a8mat=1NWF49+F9J44Y+249K+BWGDT" alt="">
+
+Yonge&Dundasの交差点にあるAMCでX-Men Origins:Wolverineを観た。
+
+公開された最初の週末だったので、上映された部屋は大きく、スクリーンは巨大で、迫力満点だった。
+
+今週Ellen Degeneresショーをみていたら、主演のヒュージャックマンがゲスト出演していた。
+
+セクシーな男性として名高いが、エレンとの会話中は終始にこやかで、映画では決してみることのなかった笑顔は、普通のきさくなおじさんっぽかった。ヒューグラントとよく混同されるというエピソードを話していた。
+
+セクシーといえば、ここ最近観た映画の３本とも、俳優達の裸を観る機会があった。
+
+
+
+１７歳以下禁止のWatchmanの濃厚なラブシーンでは主演の俳優のお尻をしっかりと撮っていたし、転々のオダギリジョーのお尻、そしてヒュージャックマンの裸、ヒュージャックマンの場合は遠くからだったが。女性誌でも男のヌード写真の特集が組まれるように、俳優のヌードシーンのニーズがあるからなのだろうか。
+
+さて、Wolverineとは何か、映画を観た後で気になったので調べてみた。
+
+イタチ科の動物で、カナダでは北部に生息していて、みかけは小さな熊といったところだが、かなりどう猛な動物らしい。森の奥深くに生息しているらしいし、カナダの北部の森まで行くこはないとおもうので、今後見かけることはなさそうだが、もし動物園にいたら、要チェックの動物になった。
+
+<table cellpadding="0" cellspacing="0" border="0" style=" border:1px solid #ccc; width:90px;"><tr style="border-style:none;"><td style="vertical-align:top; border-style:none; padding:10px 10px 0pt;"><a href="http://px.a8.net/svt/ejp?a8mat=1NWF49+F9J44Y+249K+BWGDT&a8ejpredirect=http%3A%2F%2Fwww.amazon.co.jp%2Fdp%2FB009D8434O%2F%3Ftag%3Da8-affi-140598-22" target="_blank" rel="noopener"><img loading="lazy" border="0" alt="" src="http://ecx.images-amazon.com/images/I/51tpszLXxQL._SS80_.jpg" /></a></td></tr><tr style="border-style:none;"><td style="font-size:12px; vertical-align:middle; border-style:none; padding:10px;"><p style="padding:0; margin:0;"><a href="http://px.a8.net/svt/ejp?a8mat=1NWF49+F9J44Y+249K+BWGDT&a8ejpredirect=http%3A%2F%2Fwww.amazon.co.jp%2Fdp%2FB009D8434O%2F%3Ftag%3Da8-affi-140598-22" target="_blank" rel="noopener">ウルヴァリン:X-MEN ZERO [DVD]</a></p><p style="color:#cc0000; font-weight:bold; margin-top:10px;">新品価格<br/>￥990<span style="font-weight:normal;">から</span><br/><span style="font-size:10px; font-weight:normal;">(2013/7/5 07:32時点)</span></p></td></tr></table>
+<img loading="lazy" border="0" width="1" height="1" src="http://www18.a8.net/0.gif?a8mat=1NWF49+F9J44Y+249K+BWGDT" alt="">
+
+＊日本滞在中、私が利用する宅配ＤＶＤレンタル↓↓↓。ネットで借りてポストで返せるのですごく便利でした。３０日間無料で試せます。
+＞＞＞<a href="http://px.a8.net/svt/ejp?a8mat=201S7V+B7NWXE+HVC+C1DUQ" target="_blank" rel="noopener">【TSUTAYA DISCAS】</a>（公式サイト）
+<img loading="lazy" alt="" src="http://www10.a8.net/0.gif?a8mat=201S7V+B7NWXE+HVC+C1DUQ" width="1" height="1" border="0" />
+
+
+<a href="http://overseas.blogmura.com/canada/"><img loading="lazy" src="http://overseas.blogmura.com/canada/img/canada88_31.gif" width="88" height="31" border="0" alt="にほんブログ村 海外生活ブログ カナダ情報へ" /></a><br /><a href="http://overseas.blogmura.com/canada/">にほんブログ村</a>

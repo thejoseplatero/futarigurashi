@@ -1,0 +1,11 @@
+---
+title: "ダウンタウンでラーメン～KENZO～"
+date: 2010-03-30
+categories:
+  - Ｂ級グルメ
+excerpt: "トロントにもやっと春がきたかとおもえばまた冬をおもわせる寒い日。ラーメンが食べたくなってKENZOへ。 ダウンタウンの、YONGE&amp;DUNDASの交差点から程近い便利なロケーション。 日曜の３時過ぎに着いたけれど、店内は込んでいて、一瞬満席か？と焦ったが、奥のほうにも席があり、なんとか座れて一安心。 ↑ 餃子７．９５ドル。大きめで食べ応えあり。 ↑ 札幌味噌ラーメン ８．９５ドル。 野菜たっぷりそうだったので選んだ。肉はチャーシ…"
+---
+
+<p>トロントにもやっと春がきたかとおもえばまた冬をおもわせる寒い日。ラーメンが食べたくなってKENZOへ。</p><p><img loading="lazy" class="alignnone size-medium wp-image-8659" title="kenzo4" src="http://futarigurashiphoto.files.wordpress.com/2011/02/kenzo4-300x225.jpg" alt="kenzo4" width="300" height="225" /></p><p>ダウンタウンの、YONGE&amp;DUNDASの交差点から程近い便利なロケーション。</p><p>日曜の３時過ぎに着いたけれど、店内は込んでいて、一瞬満席か？と焦ったが、奥のほうにも席があり、なんとか座れて一安心。</p><p><img loading="lazy" class="alignnone size-medium wp-image-8664" title="kenzo1" src="http://futarigurashiphoto.files.wordpress.com/2011/02/kenzo1-300x225.jpg" alt="kenzo1" width="300" height="225" /></p><p>↑　餃子７．９５ドル。大きめで食べ応えあり。</p><p><img loading="lazy" class="alignnone size-medium wp-image-8666" title="kenzo2" src="http://futarigurashiphoto.files.wordpress.com/2011/02/kenzo2-300x225.jpg" alt="kenzo2" width="300" height="225" /></p><p>↑　札幌味噌ラーメン　８．９５ドル。</p><p>野菜たっぷりそうだったので選んだ。肉はチャーシューではなくひき肉がぱらぱらとのっている。</p><p><img loading="lazy" class="alignnone size-medium wp-image-8670" title="kenzo3" src="http://futarigurashiphoto.files.wordpress.com/2011/02/kenzo3-300x225.jpg" alt="kenzo3" width="300" height="225" /></p><p>↑　とんこつラーメン。８．９５ドル。</p><p>J次郎はこってりとんこつ。たまたまかもしれないが、何故か上の札幌味噌ラーメンと比べてスープの量が少なかった。</p><p>食べ終えた感想として、私は、ひき肉タイプのラーメンがあまり好きではないことがわかったので、次はとんこつを頼もうとおもい、J次郎はボリュームにやや不満を覚え、味見したときスープがとんこつのそれより好みだったとのことで、次は札幌味噌ラーメンを頼もうとおもった。</p><p>じゃあ最初から交換すればよかったのに。</p><p>とはいえ、味千ラーメンでは、太麺タイプの麺が、どうしても、スパゲッティーを食べているような気がしてしかたなく、スープはおいしいので非常に残念な気持ちになったが、ここは麺はそのようなことはなく、スープもおいしくまた来ることは確実。</p><p><a href="http://overseas.blogmura.com/canada/"><img loading="lazy" src="http://overseas.blogmura.com/canada/img/canada88_31.gif" border="0" alt="にほんブログ村 海外生活ブログ カナダ情報へ" width="88" height="31" /></a><br>
+<a href="http://overseas.blogmura.com/canada/">にほんブログ村</a></p><p><a href="http://overseas.blogmura.com/india/"><img loading="lazy" src="http://overseas.blogmura.com/india/img/india88_31.gif" border="0" alt="にほんブログ村 海外生活ブログ インド情報へ" width="88" height="31" /></a><br>
+<a href="http://overseas.blogmura.com/india/">にほんブログ村</a></p>

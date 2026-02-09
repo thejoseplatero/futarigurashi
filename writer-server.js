@@ -58,8 +58,8 @@ function parseFrontmatter(raw) {
       const key = kv[1].toLowerCase();
       const v = kv[2].trim().replace(/^["']|["']$/g, '');
       if (key === 'categories') {
-        meta.categories = [v];
-        if (v) list = meta.categories;
+        meta.categories = v ? [v] : [];
+        list = meta.categories;
       } else {
         meta[key] = v;
       }
@@ -213,14 +213,16 @@ function getPostFromPublished(safeSlug) {
 
 function getPost(slug) {
   const safeSlug = slugify(slug) || 'post';
+  // After migration, published posts live in content/<slug>.md; drafts in drafts/<slug>.md.
   for (const dir of [DRAFTS_DIR, CONTENT_DIR]) {
     const filePath = path.join(dir, safeSlug + '.md');
     if (fs.existsSync(filePath)) {
       const raw = fs.readFileSync(filePath, 'utf8');
       const { meta, body } = parseFrontmatter(raw);
+      const fileSlug = path.basename(filePath, '.md');
       return {
-        slug: safeSlug,
-        title: meta.title || safeSlug,
+        slug: fileSlug,
+        title: meta.title || fileSlug,
         date: meta.date || '',
         categories: meta.categories || [],
         excerpt: meta.excerpt || '',
