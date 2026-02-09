@@ -69,6 +69,14 @@
     .body-preview h4 { font-size: 0.9rem; margin: 0 0 0.5rem; font-weight: 600; }
     .body-preview .preview-content { font-size: 0.9rem; line-height: 1.5; }
     .body-preview .preview-content img { max-width: 100%; height: auto; vertical-align: middle; margin: 0.25rem 0; }
+    .revisions-panel { margin-top: var(--space-m); padding-top: var(--space-m); border-top: 1px solid var(--color-border); }
+    .revisions-title { font-size: 1rem; margin: 0 0 var(--space-s); }
+    .revisions-list { font-size: 0.9rem; }
+    .revisions-list .rev-item { display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid var(--color-border); gap: 0.5rem; }
+    .revisions-list .rev-item:last-child { border-bottom: none; }
+    .revisions-list .rev-date { color: var(--color-text-muted); }
+    .revisions-list .rev-restore { padding: 0.25rem 0.5rem; font-size: 0.85rem; }
+    .list-filter .filter-select { padding: 0.35rem 0.5rem; font-size: 0.9rem; border-radius: var(--radius); border: 1px solid var(--color-border); font-family: inherit; }
   </style>
 </head>
 <body>
@@ -98,7 +106,17 @@
 
     <div id="listView" class="writer-wrap">
       <h1 id="listTitle" data-i18n="listTitle">記事一覧</h1>
-      <p><button type="button" class="btn-primary" id="btnNewPost" data-i18n="btnNewPost">新規記事</button></p>
+      <p>
+        <button type="button" class="btn-primary" id="btnNewPost" data-i18n="btnNewPost">新規記事</button>
+        <span class="list-filter" style="margin-left: 1rem;">
+          <label for="filterStatus" class="filter-label"> </label>
+          <select id="filterStatus" class="filter-select" aria-label="Filter by status">
+            <option value="all" data-i18n="filterAll">すべて</option>
+            <option value="draft" data-i18n="filterDraft">下書き</option>
+            <option value="published" data-i18n="filterPublished">公開済み</option>
+          </select>
+        </span>
+      </p>
       <div id="listContent" class="list-loading" data-i18n="loading">読み込み中…</div>
     </div>
 
@@ -136,11 +154,17 @@
         <p class="hint" data-i18n="hintMarkdown">Markdown: **太字** / ## 見出し / ![alt](images/ファイル.jpg)</p>
 
         <div class="writer-actions">
+          <button type="button" class="btn-secondary" id="btnPreview" data-i18n="preview">プレビュー</button>
           <button type="button" class="btn-secondary" id="btnSaveDraft" data-i18n="btnSaveDraft">下書き保存</button>
           <button type="button" class="btn-primary" id="btnPublish" data-i18n="btnPublish">公開する</button>
+          <button type="button" class="btn-secondary" id="btnRevertToDraft" data-i18n="revertToDraft" style="display: none;">下書きに戻す</button>
         </div>
       </form>
       <div class="save-status" id="saveStatus"></div>
+      <div class="revisions-panel" id="revisionsPanel" style="display: none;">
+        <h3 class="revisions-title" id="revisionsTitle">履歴</h3>
+        <div id="revisionsList" class="revisions-list"></div>
+      </div>
     </div>
   </div>
 
@@ -201,7 +225,17 @@
           publishing: '公開中…（ビルドと push に少し時間がかかります）',
           published: '公開しました。ブログで確認できます。',
           publishFailed: '公開に失敗しました',
-          deleteFailed: '削除に失敗しました'
+          deleteFailed: '削除に失敗しました',
+          savingAutosave: '保存中…',
+          savedAutosave: '保存しました',
+          discardChanges: '変更を破棄しますか？',
+          filterAll: 'すべて',
+          filterDraft: '下書き',
+          filterPublished: '公開済み',
+          revertToDraft: '下書きに戻す',
+          revisionsTitle: '履歴',
+          restoreRevision: 'この版を復元',
+          preview: 'プレビュー'
         },
         en: {
           navBackToList: '← Post list',
@@ -254,7 +288,17 @@
           publishing: 'Publishing… (build and push may take a moment)',
           published: 'Published. You can check the blog.',
           publishFailed: 'Publish failed',
-          deleteFailed: 'Delete failed'
+          deleteFailed: 'Delete failed',
+          savingAutosave: 'Saving…',
+          savedAutosave: 'Saved',
+          discardChanges: 'Discard changes?',
+          filterAll: 'All',
+          filterDraft: 'Draft',
+          filterPublished: 'Published',
+          revertToDraft: 'Revert to draft',
+          revisionsTitle: 'History',
+          restoreRevision: 'Restore this version',
+          preview: 'Preview'
         }
       };
 
@@ -275,6 +319,10 @@
         });
         document.getElementById('deleteConfirmPrefix').textContent = t('deleteConfirmPrefix');
         document.getElementById('deleteConfirmSuffix').textContent = t('deleteConfirmSuffix');
+        document.querySelectorAll('#filterStatus option[data-i18n]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n');
+          if (key) el.textContent = t(key);
+        });
         document.getElementById('langJa').classList.toggle('active', lang === 'ja');
         document.getElementById('langJa').setAttribute('aria-pressed', lang === 'ja');
         document.getElementById('langEn').classList.toggle('active', lang === 'en');
@@ -313,6 +361,54 @@
       var bodyInput = document.getElementById('body');
       var saveStatus = document.getElementById('saveStatus');
       var editTitleEl = document.getElementById('editTitle');
+
+      var lastSavedData = null;
+      var autosaveTimer = null;
+      var currentEditStatus = 'new';
+
+      function isDirty() {
+        if (lastSavedData === null) return true;
+        return JSON.stringify(getFormData()) !== JSON.stringify(lastSavedData);
+      }
+
+      function scheduleAutosave() {
+        if (autosaveTimer) clearTimeout(autosaveTimer);
+        if (currentEditStatus !== 'draft' && currentEditStatus !== 'new') return;
+        autosaveTimer = setTimeout(function () {
+          autosaveTimer = null;
+          var data = getFormData();
+          if (!data.slug) data.slug = slugFromTitle(data.title);
+          saveStatus.textContent = t('savingAutosave');
+          saveStatus.className = 'save-status';
+          fetch(API_BASE + '/api/posts/draft?autosave=1', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+              if (res.error) {
+                saveStatus.textContent = t('saveFailed');
+                saveStatus.className = 'save-status err';
+                return;
+              }
+              if (res.slug) slugInput.value = res.slug;
+              lastSavedData = getFormData();
+              saveStatus.textContent = t('savedAutosave');
+              saveStatus.className = 'save-status ok';
+              setTimeout(function () {
+                if (saveStatus.textContent === t('savedAutosave')) {
+                  saveStatus.textContent = '';
+                  saveStatus.className = 'save-status';
+                }
+              }, 2000);
+            })
+            .catch(function () {
+              saveStatus.textContent = t('saveFailed');
+              saveStatus.className = 'save-status err';
+            });
+        }, 2500);
+      }
 
       document.getElementById('langJa').addEventListener('click', function () { setLang('ja'); });
       document.getElementById('langEn').addEventListener('click', function () { setLang('en'); });
@@ -377,6 +473,10 @@
 
       bodyInput.addEventListener('input', updateBodyImagesAndPreview);
       bodyInput.addEventListener('change', updateBodyImagesAndPreview);
+      [titleInput, dateInput, categoriesInput, excerptInput, bodyInput, slugInput].forEach(function (el) {
+        el.addEventListener('input', scheduleAutosave);
+        el.addEventListener('change', scheduleAutosave);
+      });
 
       document.getElementById('btnInsertImage').addEventListener('click', function () {
         var url = prompt(lang === 'ja' ? '画像のURLを入力' : 'Enter image URL');
@@ -418,9 +518,14 @@
         editView.classList.remove('hidden');
         if (slug) {
           editTitleEl.textContent = t('editTitleEdit');
+          currentEditStatus = 'new';
           loadPost(slug);
         } else {
           editTitleEl.textContent = t('editTitleNew');
+          currentEditStatus = 'new';
+          lastSavedData = null;
+          document.getElementById('revisionsPanel').style.display = 'none';
+          if (btnRevertToDraft) btnRevertToDraft.style.display = 'none';
           slugInput.value = '';
           titleInput.value = '';
           dateInput.value = new Date().toISOString().slice(0, 10);
@@ -433,6 +538,43 @@
         }
       }
 
+      var allPostsList = [];
+
+      function renderList(posts) {
+        var filterVal = (document.getElementById('filterStatus') && document.getElementById('filterStatus').value) || 'all';
+        var filtered = filterVal === 'all' ? posts : posts.filter(function (p) { return p.status === filterVal; });
+        if (!filtered.length) {
+          listContent.innerHTML = '<p>' + (posts.length ? (lang === 'ja' ? '該当する記事がありません。' : 'No matching posts.') : t('noPosts')) + '</p>';
+          return;
+        }
+        var html = '<table class="post-list"><thead><tr><th>' + t('tableTitle') + '</th><th>' + t('tableCategories') + '</th><th>' + t('tableDate') + '</th><th>' + t('tableStatus') + '</th><th></th></tr></thead><tbody>';
+        filtered.forEach(function (p) {
+          var cats = Array.isArray(p.categories) ? p.categories : (p.categories ? [p.categories] : []);
+          var categoriesText = cats.map(function (c) { return escapeHtml(String(c)); }).join(', ');
+          var statusClass = p.status === 'draft' ? 'status-draft' : 'status-published';
+          var statusText = p.status === 'draft' ? t('statusDraft') : t('statusPublished');
+          html += '<tr><td>' + escapeHtml(p.title) + '</td><td class="post-list-categories">' + categoriesText + '</td><td>' + escapeHtml(p.date) + '</td><td class="' + statusClass + '">' + statusText + '</td><td class="actions">';
+          html += '<a href="#edit/' + escapeHtml(p.slug) + '">' + t('editLink') + '</a>';
+          html += '<button type="button" class="btn-danger" data-slug="' + escapeHtml(p.slug) + '" data-title="' + escapeHtml(p.title) + '">' + t('deleteLink') + '</button>';
+          html += '</td></tr>';
+        });
+        html += '</tbody></table>';
+        listContent.innerHTML = html;
+        listContent.querySelectorAll('button[data-slug]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            showDeleteConfirm(btn.getAttribute('data-slug'), btn.getAttribute('data-title'));
+          });
+        });
+        listContent.querySelectorAll('a[href^="#edit/"]').forEach(function (a) {
+          a.addEventListener('click', function (e) {
+            e.preventDefault();
+            var slug = (a.getAttribute('href') || '').replace(/^#edit\//, '');
+            try { slug = decodeURIComponent(slug); } catch (x) {}
+            showEdit(slug);
+          });
+        });
+      }
+
       function loadList() {
         listContent.innerHTML = t('loading');
         fetch(API_BASE + '/api/posts')
@@ -442,36 +584,8 @@
           })
           .then(function (posts) {
             if (!Array.isArray(posts)) throw new Error('Invalid response');
-            if (!posts.length) {
-              listContent.innerHTML = '<p>' + t('noPosts') + '</p>';
-              return;
-            }
-            var html = '<table class="post-list"><thead><tr><th>' + t('tableTitle') + '</th><th>' + t('tableCategories') + '</th><th>' + t('tableDate') + '</th><th>' + t('tableStatus') + '</th><th></th></tr></thead><tbody>';
-            posts.forEach(function (p) {
-              var cats = Array.isArray(p.categories) ? p.categories : (p.categories ? [p.categories] : []);
-              var categoriesText = cats.map(function (c) { return escapeHtml(String(c)); }).join(', ');
-              var statusClass = p.status === 'draft' ? 'status-draft' : 'status-published';
-              var statusText = p.status === 'draft' ? t('statusDraft') : t('statusPublished');
-              html += '<tr><td>' + escapeHtml(p.title) + '</td><td class="post-list-categories">' + categoriesText + '</td><td>' + escapeHtml(p.date) + '</td><td class="' + statusClass + '">' + statusText + '</td><td class="actions">';
-              html += '<a href="#edit/' + escapeHtml(p.slug) + '">' + t('editLink') + '</a>';
-              html += '<button type="button" class="btn-danger" data-slug="' + escapeHtml(p.slug) + '" data-title="' + escapeHtml(p.title) + '">' + t('deleteLink') + '</button>';
-              html += '</td></tr>';
-            });
-            html += '</tbody></table>';
-            listContent.innerHTML = html;
-            listContent.querySelectorAll('button[data-slug]').forEach(function (btn) {
-              btn.addEventListener('click', function () {
-                showDeleteConfirm(btn.getAttribute('data-slug'), btn.getAttribute('data-title'));
-              });
-            });
-            listContent.querySelectorAll('a[href^="#edit/"]').forEach(function (a) {
-              a.addEventListener('click', function (e) {
-                e.preventDefault();
-                var slug = (a.getAttribute('href') || '').replace(/^#edit\//, '');
-                try { slug = decodeURIComponent(slug); } catch (x) {}
-                showEdit(slug);
-              });
-            });
+            allPostsList = posts;
+            renderList(posts);
           })
           .catch(function (err) {
             var msg = t('listError');
@@ -493,6 +607,7 @@
             return r.json();
           })
           .then(function (p) {
+            currentEditStatus = p.status || 'published';
             slugInput.value = p.slug || '';
             titleInput.value = p.title || '';
             dateInput.value = (p.date || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
@@ -500,12 +615,64 @@
             excerptInput.value = p.excerpt || '';
             bodyInput.value = p.body || '';
             updateBodyImagesAndPreview();
+            lastSavedData = getFormData();
             saveStatus.textContent = '';
+            loadRevisions(p.slug);
+            if (btnRevertToDraft) btnRevertToDraft.style.display = (p.status === 'published') ? '' : 'none';
           })
           .catch(function () {
             saveStatus.textContent = t('loadPostError');
             saveStatus.className = 'save-status err';
           });
+      }
+
+      function loadRevisions(slug) {
+        var panel = document.getElementById('revisionsPanel');
+        var listEl = document.getElementById('revisionsList');
+        document.getElementById('revisionsTitle').textContent = t('revisionsTitle');
+        if (!slug) {
+          panel.style.display = 'none';
+          return;
+        }
+        fetch(API_BASE + '/api/posts/' + encodeURIComponent(slug) + '/revisions')
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (list) {
+            if (!list || !list.length) {
+              panel.style.display = 'none';
+              return;
+            }
+            panel.style.display = 'block';
+            listEl.innerHTML = list.map(function (rev) {
+              var dateStr = (rev.date || rev.id || '').slice(0, 19).replace('T', ' ');
+              return '<div class="rev-item"><span class="rev-date">' + escapeHtml(dateStr) + (rev.label ? ' — ' + escapeHtml(rev.label) : '') + '</span><button type="button" class="btn-secondary rev-restore" data-id="' + escapeHtml(rev.id) + '">' + t('restoreRevision') + '</button></div>';
+            }).join('');
+            listEl.querySelectorAll('.rev-restore').forEach(function (btn) {
+              btn.addEventListener('click', function () {
+                var id = btn.getAttribute('data-id');
+                fetch(API_BASE + '/api/posts/' + encodeURIComponent(slug) + '/restore', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ revisionId: id })
+                })
+                  .then(function (r) { return r.json(); })
+                  .then(function (p) {
+                    if (p.error) { setStatus(p.error, true); return; }
+                    currentEditStatus = 'draft';
+                    slugInput.value = p.slug || '';
+                    titleInput.value = p.title || '';
+                    dateInput.value = (p.date || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
+                    categoriesInput.value = Array.isArray(p.categories) ? p.categories.join(', ') : (p.categories || '');
+                    excerptInput.value = p.excerpt || '';
+                    bodyInput.value = p.body || '';
+                    updateBodyImagesAndPreview();
+                    lastSavedData = getFormData();
+                    setStatus(t('savedAutosave'));
+                  })
+                  .catch(function () { setStatus(t('saveFailed'), true); });
+              });
+            });
+          })
+          .catch(function () { panel.style.display = 'none'; });
       }
 
       function getFormData() {
@@ -541,11 +708,36 @@
               return;
             }
             slugInput.value = res.slug || data.slug;
+            currentEditStatus = 'draft';
+            lastSavedData = getFormData();
             setStatus(t('draftSaved'));
           })
           .catch(function () {
             setStatus(t('saveFailed'), true);
           });
+      });
+
+      document.getElementById('btnPreview').addEventListener('click', function () {
+        var data = getFormData();
+        if (!data.slug) data.slug = slugFromTitle(data.title);
+        fetch(API_BASE + '/api/preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (res) {
+            if (res.error) {
+              setStatus(res.error + (res.detail ? ': ' + res.detail : ''), true);
+              return;
+            }
+            var w = window.open('', '_blank');
+            if (w) {
+              w.document.write(res.html || '');
+              w.document.close();
+            }
+          })
+          .catch(function () { setStatus('Preview failed', true); });
       });
 
       document.getElementById('btnPublish').addEventListener('click', function () {
@@ -557,26 +749,46 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         })
-          .then(function (r) { return r.json(); })
+          .then(function (r) {
+            return r.text().then(function (text) {
+              try { return JSON.parse(text); } catch (e) { throw new Error(text || 'Invalid response'); }
+            });
+          })
           .then(function (res) {
             if (res.error) {
               setStatus(res.error + (res.detail ? ': ' + res.detail : ''), true);
               return;
             }
             slugInput.value = res.slug || data.slug;
-            setStatus(t('published'));
+            currentEditStatus = 'published';
+            lastSavedData = getFormData();
+            setStatus(res.pushWarning ? t('published') + ' (' + res.pushWarning + ')' : t('published'));
           })
-          .catch(function () {
-            setStatus(t('publishFailed'), true);
+          .catch(function (err) {
+            setStatus(t('publishFailed') + (err.message ? ': ' + err.message : ''), true);
           });
+      });
+
+      window.addEventListener('beforeunload', function (e) {
+        if (editView.classList.contains('hidden')) return;
+        if (isDirty() || autosaveTimer) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
       });
 
       backToList.addEventListener('click', function (e) {
         e.preventDefault();
+        if (!editView.classList.contains('hidden') && isDirty()) {
+          if (!confirm(t('discardChanges'))) return;
+        }
         showList();
       });
       backToBlog.addEventListener('click', function (e) {
         e.preventDefault();
+        if (!editView.classList.contains('hidden') && isDirty()) {
+          if (!confirm(t('discardChanges'))) return;
+        }
         window.open(backToBlog.href, '_blank');
       });
       fetch(API_BASE + '/api/config').then(function (r) { return r.json(); }).then(function (c) {
@@ -586,6 +798,34 @@
       btnNewPost.addEventListener('click', function () {
         showEdit(null);
       });
+
+      var filterStatus = document.getElementById('filterStatus');
+      if (filterStatus) {
+        filterStatus.addEventListener('change', function () {
+          renderList(allPostsList);
+        });
+      }
+
+      var btnRevertToDraft = document.getElementById('btnRevertToDraft');
+      if (btnRevertToDraft) {
+        btnRevertToDraft.addEventListener('click', function () {
+          var slug = slugInput.value.trim();
+          if (!slug) return;
+          if (!confirm(lang === 'ja' ? 'この記事を下書きに戻しますか？' : 'Revert this post to draft?')) return;
+          fetch(API_BASE + '/api/posts/' + encodeURIComponent(slug) + '/revert-to-draft', { method: 'POST' })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+              if (res.error) {
+                setStatus(res.error, true);
+                return;
+              }
+              currentEditStatus = 'draft';
+              btnRevertToDraft.style.display = 'none';
+              setStatus(t('savedAutosave'));
+            })
+            .catch(function () { setStatus(t('saveFailed'), true); });
+        });
+      }
 
       function escapeHtml(s) {
         var div = document.createElement('div');
@@ -619,8 +859,14 @@
         var slug = deleteConfirmSlug;
         hideDeleteConfirm();
         fetch(API_BASE + '/api/posts/' + encodeURIComponent(slug), { method: 'DELETE' })
-          .then(function (r) { return r.json(); })
-          .then(function () { loadList(); })
+          .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data }; }); })
+          .then(function (result) {
+            if (result.ok || (result.data && result.data.deleted)) {
+              loadList();
+            } else {
+              alert(t('deleteFailed') + (result.data && result.data.error ? ': ' + result.data.error : ''));
+            }
+          })
           .catch(function () { alert(t('deleteFailed')); });
       });
 

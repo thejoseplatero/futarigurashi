@@ -17,6 +17,12 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { spawnSync } = require('child_process');
+let marked;
+try {
+  marked = require('marked').marked;
+} catch (e) {
+  marked = null;
+}
 
 const PORT = parseInt(process.env.PORT || '3765', 10);
 const BIND = process.env.BIND || '0.0.0.0';
@@ -28,8 +34,31 @@ const WRITER_MODE = process.env.WRITER_MODE || (WRITER_BASE.includes('localhost'
 const POSTS_DIR = path.join(REPO_ROOT, 'posts');
 const CONTENT_DIR = path.join(REPO_ROOT, 'content');
 const DRAFTS_DIR = path.join(REPO_ROOT, 'drafts');
+const REVISIONS_DIR = path.join(REPO_ROOT, 'revisions');
 const DATA_DIR = path.join(REPO_ROOT, 'data');
 const POSTS_JSON = path.join(DATA_DIR, 'posts.json');
+
+const MAX_REVISIONS_PER_POST = 50;
+
+function saveRevision(slug, markdownContent, label) {
+  const dir = path.join(REVISIONS_DIR, slug.replace(/\.\./g, '').replace(/\//g, ''));
+  if (!dir || dir === REVISIONS_DIR) return;
+  fs.mkdirSync(dir, { recursive: true });
+  const id = new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '');
+  const file = path.join(dir, id + '.md');
+  fs.writeFileSync(file, markdownContent, 'utf8');
+  const indexPath = path.join(dir, 'index.json');
+  let list = [];
+  if (fs.existsSync(indexPath)) {
+    try {
+      list = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+    } catch (e) {}
+  }
+  list.push({ id, date: new Date().toISOString(), label: label || 'Save' });
+  list = list.slice(-MAX_REVISIONS_PER_POST);
+  fs.writeFileSync(indexPath, JSON.stringify(list, null, 2), 'utf8');
+  return id;
+}
 
 function slugify(str) {
   return String(str || '')
@@ -92,6 +121,92 @@ function buildMarkdownContent(data) {
   if (excerpt) out += 'excerpt: "' + excerpt.replace(/"/g, '\\"').replace(/\n/g, ' ') + '"\n';
   out += '---\n\n' + body + '\n';
   return out;
+}
+
+function escapeHtmlPreview(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatDateYMD(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toISOString().slice(0, 10);
+}
+
+function formatDateRel(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  const now = new Date();
+  const months = Math.floor((now - d) / (30 * 24 * 60 * 60 * 1000));
+  if (months < 1) return 'recently';
+  if (months < 12) return months + ' months ago';
+  return Math.floor(months / 12) + ' year' + (months >= 24 ? 's' : '') + ' ago';
+}
+
+function markdownToHtml(text) {
+  if (marked) return marked.parse(String(text || ''), { async: false });
+  return String(text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>\n');
+}
+
+function buildPreviewHtml(data) {
+  const slug = (data.slug || 'post').replace(/\.\./g, '').replace(/\//g, '');
+  const title = (data.title || '').trim() || 'Untitled';
+  const dateStr = (data.date || '').trim() || new Date().toISOString().slice(0, 10);
+  const categories = Array.isArray(data.categories) ? data.categories : (data.categories ? String(data.categories).split(',').map((c) => c.trim()).filter(Boolean) : []);
+  const excerpt = (data.excerpt || '').trim();
+  const contentHtml = markdownToHtml(data.body || '');
+  const isoDate = formatDateYMD(dateStr);
+  const dateRel = formatDateRel(dateStr);
+  const meta = categories.length ? escapeHtmlPreview(categories.join(', ')) + ' · <time datetime="' + isoDate + '">' + dateRel + '</time>' : '<time datetime="' + isoDate + '">' + dateRel + '</time>';
+  const desc = (excerpt || title).slice(0, 155).replace(/\s+/g, ' ').trim();
+  const base = WRITER_BASE + '/';
+  const SITE_NAME = 'FUTARIGURASHI';
+  return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="${escapeHtmlPreview(desc)}">
+  <title>${escapeHtmlPreview(title)} — ${SITE_NAME}</title>
+  <link rel="stylesheet" href="${base}styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="site-wrap">
+    <header class="site-header">
+      <h1 class="site-title"><a href="${base}index.html">${SITE_NAME}</a></h1>
+      <nav class="header-nav">
+        <a href="${base}archive.html" class="nav-link">記事一覧</a>
+        <a href="${base}profile.html" class="nav-link">プロフィール</a>
+      </nav>
+    </header>
+    <main class="main">
+      <article class="entry">
+        <header class="page-header">
+          <a href="${base}index.html" class="back-link">← 最新記事へ</a>
+          <p class="entry-meta">${meta}</p>
+          <h2 class="entry-title">${escapeHtmlPreview(title)}</h2>
+        </header>
+        <div class="entry-content">
+${contentHtml}
+        </div>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <p class="footer-flag" aria-hidden="true">🇨🇦</p>
+      <p class="copyright">${SITE_NAME}</p>
+    </footer>
+  </div>
+</body>
+</html>`;
 }
 
 function serveFile(filePath, res) {
@@ -293,6 +408,21 @@ const server = http.createServer((req, res) => {
     }
   }
 
+  if (pathname === '/api/preview' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        const html = buildPreviewHtml(data);
+        jsonResponse(res, 200, { html });
+      } catch (e) {
+        jsonResponse(res, 400, { error: 'Invalid JSON', detail: e.message });
+      }
+    });
+    return;
+  }
+
   if (pathname === '/api/posts') {
     if (req.method === 'GET') {
       jsonResponse(res, 200, listPosts());
@@ -334,37 +464,143 @@ const server = http.createServer((req, res) => {
       let body = '';
       req.on('data', (chunk) => { body += chunk; });
       req.on('end', () => {
-        let data;
         try {
-          data = JSON.parse(body);
-        } catch (e) {
-          jsonResponse(res, 400, { error: 'Invalid JSON' });
-          return;
-        }
-        const slug = slugify(data.slug || data.title) || 'post';
-        const content = buildMarkdownContent({ ...data, draft: false });
-        fs.mkdirSync(CONTENT_DIR, { recursive: true });
-        const draftPath = path.join(DRAFTS_DIR, slug + '.md');
-        if (fs.existsSync(draftPath)) fs.unlinkSync(draftPath);
-        try {
-          fs.writeFileSync(path.join(CONTENT_DIR, slug + '.md'), content, 'utf8');
+          let data;
+          try {
+            data = JSON.parse(body);
+          } catch (e) {
+            jsonResponse(res, 400, { error: 'Invalid JSON' });
+            return;
+          }
+          const slug = slugify(data.slug || data.title) || 'post';
+          const contentPath = path.join(CONTENT_DIR, slug + '.md');
+          if (fs.existsSync(contentPath)) {
+            const existing = fs.readFileSync(contentPath, 'utf8');
+            saveRevision(slug, existing, 'Publish');
+          }
+          const content = buildMarkdownContent({ ...data, draft: false });
+          fs.mkdirSync(CONTENT_DIR, { recursive: true });
+          const draftPath = path.join(DRAFTS_DIR, slug + '.md');
+          if (fs.existsSync(draftPath)) fs.unlinkSync(draftPath);
+          fs.writeFileSync(contentPath, content, 'utf8');
+          const buildResult = runBuild();
+          if (!buildResult.ok) {
+            jsonResponse(res, 500, { error: 'Build failed', detail: buildResult.stderr });
+            return;
+          }
+          const pushResult = runGitPush('Publish: ' + (data.title || slug));
+          if (!pushResult.ok) {
+            console.error('Push failed after publish:', pushResult.error);
+            jsonResponse(res, 200, { slug, published: true, pushWarning: pushResult.error });
+          } else {
+            jsonResponse(res, 200, { slug, published: true });
+          }
         } catch (err) {
-          jsonResponse(res, 500, { error: err.message });
-          return;
+          console.error('Publish error:', err);
+          jsonResponse(res, 500, { error: 'Publish failed', detail: err.message });
         }
-        const buildResult = runBuild();
-        if (!buildResult.ok) {
-          jsonResponse(res, 500, { error: 'Build failed', detail: buildResult.stderr });
-          return;
-        }
-        const pushResult = runGitPush('Publish: ' + (data.title || slug));
-        if (!pushResult.ok) {
-          jsonResponse(res, 500, { error: 'Push failed', detail: pushResult.error });
-          return;
-        }
-        jsonResponse(res, 200, { slug, published: true });
       });
       return;
+    }
+    if (suffix.includes('/revert-to-draft') && req.method === 'POST') {
+      const parts = suffix.split('/');
+      const slug = (parts[0] || '').replace(/\.\./g, '').replace(/\//g, '').trim() || 'post';
+      if (parts[1] === 'revert-to-draft') {
+        const contentPath = path.join(CONTENT_DIR, slug + '.md');
+        if (!fs.existsSync(contentPath)) {
+          jsonResponse(res, 404, { error: 'Not found' });
+          return;
+        }
+        const raw = fs.readFileSync(contentPath, 'utf8');
+        const { meta, body } = parseFrontmatter(raw);
+        const asDraft = buildMarkdownContent({
+          title: meta.title || slug,
+          date: meta.date || '',
+          categories: meta.categories || [],
+          excerpt: meta.excerpt || '',
+          body,
+          draft: true
+        });
+        fs.mkdirSync(DRAFTS_DIR, { recursive: true });
+        fs.writeFileSync(path.join(DRAFTS_DIR, slug + '.md'), asDraft, 'utf8');
+        fs.unlinkSync(contentPath);
+        const buildResult = runBuild();
+        if (!buildResult.ok) {
+          console.error('Build failed after revert-to-draft:', buildResult.stderr);
+        }
+        jsonResponse(res, 200, { slug, reverted: true });
+        return;
+      }
+    }
+    if (suffix.includes('/revisions')) {
+      const parts = suffix.split('/');
+      const revSlug = (parts[0] || '').replace(/\.\./g, '').replace(/\//g, '').trim() || 'post';
+      const revDir = path.join(REVISIONS_DIR, revSlug);
+      if (parts[1] === 'revisions' && parts.length >= 2) {
+        if (req.method === 'GET' && parts.length === 2) {
+          const indexPath = path.join(revDir, 'index.json');
+          let list = [];
+          if (fs.existsSync(indexPath)) {
+            try {
+              list = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+            } catch (e) {}
+          }
+          list.reverse();
+          jsonResponse(res, 200, list);
+          return;
+        }
+        if (req.method === 'GET' && parts.length === 3) {
+          const id = (parts[2] || '').replace(/\.\./g, '').replace(/\//g, '');
+          const file = path.join(revDir, id + '.md');
+          if (!fs.existsSync(file)) {
+            jsonResponse(res, 404, { error: 'Not found' });
+            return;
+          }
+          const raw = fs.readFileSync(file, 'utf8');
+          const { meta, body } = parseFrontmatter(raw);
+          jsonResponse(res, 200, { slug: revSlug, title: meta.title, date: meta.date, categories: meta.categories || [], excerpt: meta.excerpt || '', body });
+          return;
+        }
+      }
+    }
+    if (suffix.includes('/restore') && req.method === 'POST') {
+      const parts = suffix.split('/');
+      const restSlug = (parts[0] || '').replace(/\.\./g, '').replace(/\//g, '').trim() || 'post';
+      if (parts[1] === 'restore') {
+        let body = '';
+        req.on('data', (chunk) => { body += chunk; });
+        req.on('end', () => {
+          let data;
+          try {
+            data = JSON.parse(body);
+          } catch (e) {
+            jsonResponse(res, 400, { error: 'Invalid JSON' });
+            return;
+          }
+          const revisionId = (data.revisionId || '').replace(/\.\./g, '').replace(/\//g, '');
+          const revDir = path.join(REVISIONS_DIR, restSlug);
+          const file = path.join(revDir, revisionId + '.md');
+          if (!fs.existsSync(file)) {
+            jsonResponse(res, 404, { error: 'Revision not found' });
+            return;
+          }
+          const markdown = fs.readFileSync(file, 'utf8');
+          const draftPath = path.join(DRAFTS_DIR, restSlug + '.md');
+          fs.mkdirSync(DRAFTS_DIR, { recursive: true });
+          fs.writeFileSync(draftPath, markdown, 'utf8');
+          const { meta, body: postBody } = parseFrontmatter(markdown);
+          jsonResponse(res, 200, {
+            slug: restSlug,
+            title: meta.title || restSlug,
+            date: meta.date || '',
+            categories: meta.categories || [],
+            excerpt: meta.excerpt || '',
+            body: postBody,
+            status: 'draft'
+          });
+        });
+        return;
+      }
     }
     if (req.method === 'GET') {
       const post = getPost(suffix);
@@ -377,28 +613,33 @@ const server = http.createServer((req, res) => {
     }
     if (req.method === 'DELETE') {
       try {
-        // Try both raw suffix and slugify so we match the actual filename (client sends list slug)
-        const slugCandidates = [
-          suffix.replace(/^\/+|\/+$/g, '').replace(/\.\./g, '').replace(/\//g, '').trim(),
-          slugify(suffix)
-        ].filter(Boolean);
-        const slug = slugCandidates[0] || 'post';
+        const normalizedSuffix = suffix.replace(/^\/+|\/+$/g, '').replace(/\.\./g, '').replace(/\//g, '').trim();
+        const slugCandidates = [normalizedSuffix, slugify(suffix)].filter(Boolean);
+        const seen = new Set();
+        const uniq = slugCandidates.filter((s) => {
+          if (seen.has(s)) return false;
+          seen.add(s);
+          return true;
+        });
         let removed = false;
         let usedSlug = null;
         for (const dir of [DRAFTS_DIR, CONTENT_DIR]) {
-          for (const trySlug of slugCandidates) {
-            const filePath = path.join(dir, trySlug + '.md');
-            if (fs.existsSync(filePath)) {
+          if (!fs.existsSync(dir)) continue;
+          const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md'));
+          for (const file of files) {
+            const fileSlug = file.slice(0, -3);
+            const match = uniq.some((c) => c === fileSlug);
+            if (match) {
+              const filePath = path.join(dir, file);
               fs.unlinkSync(filePath);
               removed = true;
-              usedSlug = trySlug;
+              usedSlug = fileSlug;
               if (dir === CONTENT_DIR) {
-                // Update posts.json and remove post HTML immediately so list refreshes even if build fails
                 if (fs.existsSync(POSTS_JSON)) {
                   try {
                     let list = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8'));
                     if (Array.isArray(list)) {
-                      list = list.filter((p) => p && p.slug !== trySlug);
+                      list = list.filter((p) => p && p.slug !== fileSlug);
                       fs.mkdirSync(DATA_DIR, { recursive: true });
                       fs.writeFileSync(POSTS_JSON, JSON.stringify(list, null, 2), 'utf8');
                     }
@@ -406,13 +647,13 @@ const server = http.createServer((req, res) => {
                     console.error('Update posts.json after delete:', e.message);
                   }
                 }
-                const htmlPath = path.join(POSTS_DIR, trySlug + '.html');
+                const htmlPath = path.join(POSTS_DIR, fileSlug + '.html');
                 if (fs.existsSync(htmlPath)) fs.unlinkSync(htmlPath);
                 const buildResult = runBuild();
                 if (!buildResult.ok) {
                   console.error('Build failed after delete:', buildResult.stderr);
                 }
-                const pushResult = runGitPush('Delete post: ' + trySlug);
+                const pushResult = runGitPush('Delete post: ' + fileSlug);
                 if (!pushResult.ok) {
                   console.error('Push failed after delete:', pushResult.error);
                 }
@@ -423,7 +664,7 @@ const server = http.createServer((req, res) => {
           if (removed) break;
         }
         if (removed) {
-          jsonResponse(res, 200, { deleted: true, slug: usedSlug || slug });
+          jsonResponse(res, 200, { deleted: true, slug: usedSlug });
         } else {
           jsonResponse(res, 404, { error: 'Not found' });
         }
